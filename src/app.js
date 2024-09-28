@@ -18,11 +18,11 @@ app.get('/api', (req, res) => {
 
 (async () => {
   try {
-    await mongoDbConnect(); // MongoDB 연결
+    await mongoDbConnect();
     app.listen(ENV_KEY.PORT, () => {
       console.log(`${ENV_KEY.PORT} 포트로 서버가 열렸습니다.`);
     });
   } catch (error) {
-    console.error('서버 연결 실패하였습니다:', error); // 에러 메시지 출력
+    console.error('서버 연결 실패하였습니다:', error);
   }
 })();

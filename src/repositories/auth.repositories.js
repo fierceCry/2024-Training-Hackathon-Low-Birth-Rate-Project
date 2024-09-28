@@ -8,6 +8,10 @@ export class AuthRepository {
     return this.userModel.findOne({ id }).exec();
   }
 
+  async findUserByObjectId({ id }) {
+    return this.userModel.findOne({ _id: id }).exec();
+  }
+
   async findByUserName({ username }) {
     return this.userModel.findOne({ username }).exec();
   }
