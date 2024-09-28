@@ -17,4 +17,19 @@ export class AuthController {
       next(error);
     }
   }
+
+  signIn = async (req, res, next) => {
+    try {
+      const { id, password } = req.body;
+      const token = await this.authServices.signIn({
+        id,
+        password
+      });
+      return res
+        .status(HTTP_STATUS.OK)
+        .json({ message: '로그인이 성공하였습니다.', data: token });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

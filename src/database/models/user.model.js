@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// 사용자 스키마 정의
 const userSchema = new mongoose.Schema({
   id: {
     type: String,
@@ -25,6 +24,9 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  deletedAt: {
+    type: Date
   }
 });
 

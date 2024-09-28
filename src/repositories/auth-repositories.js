@@ -1,6 +1,7 @@
 export class AuthRepository {
-  constructor(userModel) {
+  constructor(userModel, refreshTokenModel) {
     this.userModel = userModel;
+    this.refreshTokenModel = refreshTokenModel;
   }
 
   async findUserById({ id }) {
@@ -18,5 +19,13 @@ export class AuthRepository {
       username,
     });
     return newUser.save();
+  }
+
+  async token(id, hashRefreshToken) {
+    const newToken = new this.refreshTokenModel({
+      userId: id,
+      token: hashRefreshToken,
+    });
+    return newToken.save();
   }
 }
