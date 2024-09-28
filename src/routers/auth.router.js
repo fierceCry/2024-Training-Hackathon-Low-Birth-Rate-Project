@@ -1,7 +1,7 @@
 import express from "express";
-import { AuthController } from "../controllers/auth-controller.js";
-import { AuthServices } from "../services/auth-serivces.js";
-import { AuthRepository } from "../repositories/auth-repositories.js";
+import { AuthController } from "../controllers/auth.controller.js";
+import { AuthServices } from "../services/auth.services.js";
+import { AuthRepository } from "../repositories/auth.repositories.js";
 import User from "../database/models/user.model.js";
 import RefreshToken from "../database/models/refreshToken.model.js";
 
