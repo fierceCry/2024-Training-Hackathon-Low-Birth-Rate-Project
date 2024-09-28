@@ -29,11 +29,11 @@ export class CommunityRepository {
       content,
       userId,
     };
-  
+
     return this.communityModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
   }
 
-  async deleteCommunityById({userId, id}) {
+  async deleteCommunityById({ userId, id }) {
     return this.communityModel.findByIdAndDelete(id, userId).exec();
   }
 }

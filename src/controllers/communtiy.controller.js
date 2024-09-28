@@ -62,7 +62,7 @@ export class CommunityController {
       const { id } = req.params;
 
       await this.communityServices.deleteCommunity({userId, id});
-      return res.status(HTTP_STATUS.OK).json({ message: '성공적으로 삭제되었습니다.' });
+      return res.status(HTTP_STATUS.OK).json({ message: "성공적으로 삭제되었습니다." });
     } catch (error) {
       next(error);
     }

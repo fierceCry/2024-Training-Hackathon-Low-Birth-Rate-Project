@@ -27,7 +27,7 @@ export class AuthController {
       });
       return res
         .status(HTTP_STATUS.OK)
-        .json({ message: '로그인이 성공하였습니다.', data: token });
+        .json({ message: "로그인이 성공하였습니다.", data: token });
     } catch (error) {
       next(error);
     }
