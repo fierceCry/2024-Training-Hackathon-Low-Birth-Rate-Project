@@ -4,8 +4,8 @@ export class AuthRepository {
     this.refreshTokenModel = refreshTokenModel;
   }
 
-  async findUserById({ id }) {
-    return this.userModel.findOne({ id }).exec();
+  async findUserById({ logId }) {
+    return this.userModel.findOne({ logId }).exec();
   }
 
   async findUserByObjectId({ id }) {
@@ -16,9 +16,9 @@ export class AuthRepository {
     return this.userModel.findOne({ username }).exec();
   }
 
-  async createUser({ id, hashedPassword, username }) {
+  async createUser({ logId, hashedPassword, username }) {
     const newUser = new this.userModel({
-      id,
+      logId,
       password: hashedPassword,
       username,
     });

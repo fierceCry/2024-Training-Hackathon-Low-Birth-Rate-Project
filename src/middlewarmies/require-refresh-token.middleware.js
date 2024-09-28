@@ -29,7 +29,6 @@ const refreshTokenMiddleware = async (req, res, next) => {
     }
 
     const tokenData = await authRepository.findByToken(payload.id);
-    console.log(tokenData)
     if (!tokenData) {
       throw new HttpError.BadRequest('폐기 된 인증 정보입니다.');
     }
@@ -39,7 +38,7 @@ const refreshTokenMiddleware = async (req, res, next) => {
       throw new HttpError.BadRequest('폐기 된 인증 정보입니다.');
     }
 
-    const { id, role } = payload;
+    const { id } = payload;
     const user = await authRepository.findUserByObjectId({ id });
     if (!user) {
       throw new HttpError.NotFound('인증 정보와 일치하는 사용자가 없습니다.');

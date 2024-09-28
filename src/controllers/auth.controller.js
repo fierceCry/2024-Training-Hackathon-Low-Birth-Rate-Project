@@ -7,9 +7,9 @@ export class AuthController {
 
   signUp = async (req, res, next) => {
     try {
-      const { id, password, username } = req.body;
+      const { logId, password, username } = req.body;
 
-      await this.authServices.signUp({ id, password, username });
+      await this.authServices.signUp({ logId, password, username });
       return res
         .status(HTTP_STATUS.CREATED)
         .json({ message: "회원가입이 완료되었습니다." });
@@ -20,9 +20,9 @@ export class AuthController {
 
   signIn = async (req, res, next) => {
     try {
-      const { id, password } = req.body;
+      const { logId, password } = req.body;
       const token = await this.authServices.signIn({
-        id,
+        logId,
         password
       });
       return res
