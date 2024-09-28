@@ -21,11 +21,11 @@ export class CommunityServices {
     return data;
   }
 
-  async updateCommunity({userId, id, title, content}) {
-    return this.communityRepository.updateCommunityById({userId, id, title, content});
+  async updateCommunity({ userId, id, title, content }) {
+    return this.communityRepository.updateCommunityById({ userId, id, title, content });
   }
 
-  async deleteCommunity({userId, id}) {
-    return this.communityRepository.deleteCommunityById({userId, id});
+  async deleteCommunity({ userId, id }) {
+    return this.communityRepository.deleteCommunityById({ userId, id });
   }
 }

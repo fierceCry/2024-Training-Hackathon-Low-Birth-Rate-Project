@@ -9,8 +9,8 @@ export class AuthServices {
     this.authRepository = authRepository;
   }
 
-  async signUp({ id, password, username }) {
-    const user = await this.authRepository.findUserById({ id });
+  async signUp({ logId, password, username }) {
+    const user = await this.authRepository.findUserById({ logId });
     if (user) {
       throw new HttpError.Conflict("이미 가입된 사용자가 있습니다.");
     }
@@ -24,15 +24,15 @@ export class AuthServices {
 
     const hashedPassword = bcrypt.hashSync(password, HASH_SALT_ROUNDS);
     await this.authRepository.createUser({
-      id,
+      logId,
       hashedPassword,
       username,
     });
   }
 
-  async signIn({ id, password }) {
+  async signIn({ logId, password }) {
     const user = await this.authRepository.findUserById({
-      id,
+      logId,
     });
     if (!user) {
       throw new HttpError.BadRequest("가입 된 사용자가 없습니다.");
