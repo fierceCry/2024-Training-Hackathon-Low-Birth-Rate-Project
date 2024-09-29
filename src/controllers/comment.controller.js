@@ -12,9 +12,9 @@ export class CommentController {
     return res.status(HTTP_STATUS.CREATED).json({ message: "댓글 생성 완료되었습니다.", data });
   };
 
-  getComments = async (req, res) => {
+  getAllComments = async (req, res) => {
     const { communtiyId } = req.params;
-    const data = await this.commentService.getComments({ communtiyId });
+    const data = await this.commentService.getAllComments({ communtiyId });
     return res.status(HTTP_STATUS.OK).json({ message: "댓글 조회 완료되었습니다.", data });
   };
 

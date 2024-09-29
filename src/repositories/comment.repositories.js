@@ -1,8 +1,7 @@
-import mongoose from "mongoose";
-
 export class CommentRepository {
-  constructor(commentModel) {
+  constructor(commentModel, replyModel) {
     this.commentModel = commentModel;
+    this.replyModel = replyModel;
   }
 
   async createComment({ content, _id, communtiyId }) {
@@ -13,9 +12,17 @@ export class CommentRepository {
     });
     return await data.save();
   }
-  
-  async getComments({ communtiyId }) {
-    return this.commentModel.find({ communtiyId });
+
+  async getAllComments({ communtiyId }) {
+    const comments = await this.commentModel.find({ communtiyId });
+
+    const replies = await this.replyModel.find({ commentId: { $in: comments.map(comment => comment._id) } });
+
+    comments.forEach(comment => {
+      comment.replies = replies.filter(reply => reply.commentId.equals(comment._id));
+    });
+
+    return comments;
   }
 
   async updateComment({ _id, communtiyId, content }) {
@@ -24,5 +31,5 @@ export class CommentRepository {
 
   async deleteComment({ _id, communtiyId }) {
     return this.commentModel.findByIdAndDelete({ _id, communtiyId });
-  } 
+  }
 }

@@ -8,8 +8,8 @@ export class CommentService {
     return data;
   }
 
-  async getComments({ communtiyId }) {
-    return this.commentRepository.getComments({ communtiyId });
+  async getAllComments({ communtiyId }) {
+    return this.commentRepository.getAllComments({ communtiyId });
   }
   
   async updateComment({ _id, communtiyId, content }) {
