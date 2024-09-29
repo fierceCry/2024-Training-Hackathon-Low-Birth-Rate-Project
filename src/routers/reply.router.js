@@ -12,8 +12,7 @@ const replyService = new ReplyService(replyRepository);
 const replyController = new ReplyController(replyService);
 
 replyRouter.post("", authMiddleware, replyController.createReply);
-// replyRouter.get("/", replyController.getReplies);
-// replyRouter.put("/:id", replyController.updateReply);
-// replyRouter.delete("/:id", replyController.deleteReply);
+replyRouter.patch("/:replyId", authMiddleware, replyController.updateReply);
+replyRouter.delete("/:replyId", authMiddleware, replyController.deleteReply);
 
 export { replyRouter };

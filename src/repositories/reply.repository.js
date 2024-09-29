@@ -11,4 +11,12 @@ export class ReplyRepository {
     });
     return await data.save();
   }
+
+  async updateReply({ _id, replyId, content }) {  
+    return this.replyModel.findByIdAndUpdate({ _id, replyId, content });
+  }
+
+  async deleteReply({ _id, replyId }) {
+    return this.replyModel.findByIdAndDelete({ _id, replyId });
+  }
 }
