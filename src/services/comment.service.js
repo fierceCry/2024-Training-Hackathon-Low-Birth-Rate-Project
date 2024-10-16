@@ -1,22 +1,46 @@
 export class CommentService {
-  constructor(CommentRepository) {
-    this.commentRepository = CommentRepository;
+  constructor(prisma) {
+    this.prisma = prisma;
   }
 
-  async createComment({ content, _id, communtiyId }) {
-    const data = await this.commentRepository.createComment({ content, _id, communtiyId });
-    return data;
+  // 댓글 생성
+  async createComment({ content, userId, communityId }) {
+    return this.prisma.comment.create({
+      data: {
+        content: content,
+        userId: userId,
+        communityId: communityId,
+      },
+    });
   }
 
-  async getAllComments({ communtiyId }) {
-    return this.commentRepository.getAllComments({ communtiyId });
+  // 특정 커뮤니티에 속한 모든 댓글 가져오기
+  async getAllComments({ communityId }) {
+    return this.prisma.comment.findMany({
+      where: {
+        communityId: communityId,
+      },
+    });
   }
-  
-  async updateComment({ _id, communtiyId, content }) {
-    return this.commentRepository.updateComment({ _id, communtiyId, content });
+
+  // 댓글 업데이트
+  async updateComment({ id, content }) {
+    return this.prisma.comment.update({
+      where: {
+        id: id,
+      },
+      data: {
+        content: content,
+      },
+    });
   }
-  
-  async deleteComment({ _id, communtiyId }) {
-    return this.commentRepository.deleteComment({ _id, communtiyId });
-  } 
+
+  // 댓글 삭제
+  async deleteComment({ id }) {
+    return this.prisma.comment.delete({
+      where: {
+        id: id,
+      },
+    });
+  }
 }

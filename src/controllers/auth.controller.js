@@ -1,15 +1,15 @@
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 
 export class AuthController {
-  constructor(authServices) {
+    constructor(authServices) {
     this.authServices = authServices;
-  }
+    }
 
-  signUp = async (req, res, next) => {
+    signUp = async (req, res, next) => {
     try {
-      const { logId, password, username } = req.body;
+        const { email, password, name } = req.body;
 
-      await this.authServices.signUp({ logId, password, username });
+      await this.authServices.signUp({ email, password, name });
       return res
         .status(HTTP_STATUS.CREATED)
         .json({ message: "회원가입이 완료되었습니다." });
@@ -20,9 +20,9 @@ export class AuthController {
 
   signIn = async (req, res, next) => {
     try {
-      const { logId, password } = req.body;
+      const { email, password } = req.body;
       const token = await this.authServices.signIn({
-        logId,
+        email,
         password
       });
       return res

@@ -9,30 +9,35 @@ export class AuthServices {
     this.authRepository = authRepository;
   }
 
-  async signUp({ logId, password, username }) {
-    const user = await this.authRepository.findUserById({ logId });
+  async signUp({ email, password, name }) {
+    if(!email || !password || !name){
+      throw new HttpError.BadRequest('email, password, name 값 확인해 주세요.');
+    }
+
+    const user = await this.authRepository.findUserByEmail({ email });
     if (user) {
-      throw new HttpError.Conflict("이미 가입된 사용자가 있습니다.");
+      throw new HttpError.Conflict("이미 가입된 이메일이 있습니다.");
     }
 
     const existingNickname = await this.authRepository.findByUserName({
-      username,
+      name,
     });
     if (existingNickname) {
       throw new HttpError.Conflict("이미 사용 중인 닉네임입니다.");
     }
 
     const hashedPassword = bcrypt.hashSync(password, HASH_SALT_ROUNDS);
-    await this.authRepository.createUser({
-      logId,
+
+    return this.authRepository.createUser({
+      email,
       hashedPassword,
-      username,
+      name,
     });
   }
 
-  async signIn({ logId, password }) {
-    const user = await this.authRepository.findUserById({
-      logId,
+  async signIn({ email, password }) {
+    const user = await this.authRepository.findUserByEmail({
+      email
     });
     if (!user) {
       throw new HttpError.BadRequest("가입 된 사용자가 없습니다.");
@@ -41,14 +46,12 @@ export class AuthServices {
     const isValidPassword = bcrypt.compareSync(password, user.password);
 
     if (!isValidPassword) {
-      throw new HttpError.Unauthorized("인증정보가 유효하지 않습니다.");
+      throw new HttpError.Unauthorized("비밀번호가 일치하지 않습니다.");
     }
 
-    const { accessToken, refreshToken, hashRefreshToken } = this.generateTokens(
-      user._id
-    );
-    await this.authRepository.token(user._id, hashRefreshToken);
+    const { accessToken, refreshToken, hashRefreshToken } = this.generateTokens(user._id);
 
+    await this.authRepository.createToken({ userId: user.id, hashRefreshToken });
     return { accessToken, refreshToken };
   }
 

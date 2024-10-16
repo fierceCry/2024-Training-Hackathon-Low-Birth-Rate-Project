@@ -1,12 +1,14 @@
 export class ChatRepository {
-  constructor(chatModel) {
-    this.chatModel = chatModel;
+  constructor(prisma) {
+    this.prisma = prisma;
   }
-
+  
   async createChat({ message }) {
-    const data = new this.chatModel({ 
-      messages: message
+    console.log(message)
+    return this.prisma.chat.create({
+      data: {
+        message
+      },
     });
-    return await data.save();
   }
 }
