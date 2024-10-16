@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import User from "../database/models/user.model.js";
 import { ENV_KEY } from "../constants/env.constants.js";
 import { HttpError } from "../errors/http.error.js";
 import { AuthRepository } from "../repositories/auth.repositories.js";
+import { prisma } from "../database/db.prisma.js";
 
-const authRepository = new AuthRepository(User);
+const authRepository = new AuthRepository(prisma);
 
 const validateToken = async (token, secretKey) => {
   try {
@@ -39,7 +39,7 @@ const authMiddleware = async (req, res, next) => {
       throw new HttpError.Unauthorized("인증 정보가 유효하지 않습니다.");
     }
     const { id } = payload;
-    const user = await authRepository.findUserByObjectId({ id });
+    const user = await authRepository.findUserById(id);
     if (!user) {
       throw new HttpError.NotFound("인증 정보와 일치하는 사용자가 없습니다.");
     }

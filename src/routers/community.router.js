@@ -3,11 +3,10 @@ import { CommunityController } from "../controllers/communtiy.controller.js";
 import { CommunityServices } from "../services/community.service.js";
 import { CommunityRepository } from "../repositories/community.repositiories.js";
 import { authMiddleware } from "../middlewarmies/require-access-token.middleware.js";
-import community from "../database/models/community.model.js";
-
+import { prisma } from "../database/db.prisma.js";
 const communityRouter = express.Router();
 
-const communityRepository = new CommunityRepository(community);
+const communityRepository = new CommunityRepository(prisma);
 const communityServices = new CommunityServices(communityRepository);
 const communityController = new CommunityController(communityServices);
 

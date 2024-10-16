@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique @map("email")
+  password      String
+  name      String
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt  @map("updated_at")
+  deletedAt     DateTime?      @map("deleted_at")
+  
+  refreshTokens RefreshToken[]
+  comments      Comment[]
+  chat          Chat[]
+
+  @@map("user")
+}
+
+model RefreshToken {
+  id     Int           @id @default(autoincrement())
+  userId Int           @map("user_id") @unique
+  token  String
+  user   User          @relation(fields: [userId], references: [id])
+
+  @@map("refresh_token")
+}
+
+model BirthSupportData {
+  id                        Int            @id @default(autoincrement())
+  number                    String
+  title                     String
+  registrationDate          String         @map("registration_date")
+  addressProvince           String         @map("address_province")
+  addressCity               String         @map("address_city")
+  detailContent             String         @db.Text @map("detail_content")
+  createdAt                 DateTime       @default(now()) @map("created_at")
+  updatedAt                 DateTime       @updatedAt  @map("updated_at")
+  deletedAt                 DateTime?      @map("deleted_at")
+
+  @@map("birth_support_data")
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  content     String
+  userId      Int       @map("user_id")
+  communityId Int       @map("commmunity_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  replies     Reply[]
+
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("comment")
+}
+
+model Reply {
+  id         Int       @id @default(autoincrement())
+  text       String
+  commentId  Int       @map("comment_id")
+  createdAt  DateTime  @default(now())  @map("created_at")  
+  updatedAt  DateTime  @updatedAt       @map("updated_at")
+
+  comment    Comment   @relation(fields: [commentId], references: [id])
+
+  @@map("reply")
+}
+
+model Chat {
+  id         Int       @id @default(autoincrement())
+  userId     Int       
+  message   String     @db.Text
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id])
+  @@map("chat")
+}

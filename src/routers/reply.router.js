@@ -2,12 +2,11 @@ import express from "express";
 import { ReplyController } from "../controllers/reply.controller.js";
 import { ReplyService } from "../services/reply.service.js";
 import { ReplyRepository } from "../repositories/reply.repository.js";  
-import Reply from "../database/models/reply.model.js";
 import { authMiddleware } from "../middlewarmies/require-access-token.middleware.js";
-
+import { prisma } from "../database/db.prisma.js";
 const replyRouter = express.Router();
 
-const replyRepository = new ReplyRepository(Reply); 
+const replyRepository = new ReplyRepository(prisma); 
 const replyService = new ReplyService(replyRepository);
 const replyController = new ReplyController(replyService);
 
