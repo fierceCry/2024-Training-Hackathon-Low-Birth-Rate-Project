@@ -6,7 +6,7 @@ module.exports = {
     const url = "https://www.childcare.go.kr/?menuno=279"; // 크롤링할 URL
 
     try {
-      const { prisma } = await import('../src/database/db.prisma.js'); // 동적 import
+      const { prisma } = await import('../src/database/db.prisma.js');
 
       const browser = await puppeteer.launch({ headless: true });
       const page = await browser.newPage();
@@ -23,7 +23,6 @@ module.exports = {
       while (hasMorePages) {
         console.log(`Scraping page ${currentPage}`);
 
-        // 현재 페이지 데이터 크롤링
         const items = await page.evaluate(() => {
           const rows = Array.from(
             document.querySelectorAll(".table_type01.hnone.scroll.text_center.mb30 tbody tr"),
@@ -47,16 +46,14 @@ module.exports = {
             .filter((item) => item.number && item.title);
         });
 
-        console.log(items);
         allItems.push(...items);
 
         // 각 아이템의 상세 정보를 크롤링
         for (let item of items) {
           try {
-            // item.number가 1인 경우 크롤링 후 종료
             if (item.number === "1") {
               console.log("item.number가 1이므로 크롤링을 종료합니다.");
-              hasMorePages = false; // 더 이상 페이지를 크롤링하지 않음
+              hasMorePages = false;
             }
 
             if (item.onclick) {
@@ -75,15 +72,13 @@ module.exports = {
                   document.querySelector(".sub_contents_wrap .contents .text-bbsbox .textview")
                     ?.innerText || "No Content";
                 
-                // 제목을 공백으로 분할
+
                 const titleParts = title.split(" ");
                 
-                // addressProvince와 addressCity에 각각 값 할당
-                const addressProvince = titleParts[0]; // 첫 번째 부분
-                const addressCity = titleParts[1];      // 두 번째 부분
+                const addressProvince = titleParts[0];
+                const addressCity = titleParts[1];
 
-                // title에서 두 부분을 제거한 나머지를 다시 합침
-                title = titleParts.slice(2).join(" ").trim(); // 필요한 경우에 따라 title 수정
+                title = titleParts.slice(2).join(" ").trim();
 
                 content = content.replace(/\n/g, "<br>").replace(/\s\s+/g, " ").trim();
               
@@ -92,8 +87,8 @@ module.exports = {
 
               item.detailTitle = detailData.title;
               item.detailContent = detailData.content;
-              item.addressProvince = detailData.addressProvince; // addressProvince 추가
-              item.addressCity = detailData.addressCity; // addressCity 추가
+              item.addressProvince = detailData.addressProvince;
+              item.addressCity = detailData.addressCity;
             }
 
             // 데이터베이스에 저장
@@ -102,16 +97,14 @@ module.exports = {
                 number: item.number,
                 title: item.title,
                 registrationDate: item.registrationDate,
-                addressProvince: item.addressProvince, // addressProvince 저장
-                addressCity: item.addressCity, // addressCity 저장
+                addressProvince: item.addressProvince,
+                addressCity: item.addressCity,
                 detailContent: item.detailContent,
               },
             });
 
-            // 이전 페이지로 돌아오기
             await page.goBack({ waitUntil: "networkidle2" });
 
-            // 오류 페이지 확인
             const errorPage = await page.evaluate(() => {
               const errorElement = document.getElementById("main-frame-error");
               return errorElement ? true : false;
@@ -166,7 +159,7 @@ module.exports = {
           currentPage++;
         } else {
           console.log("다음 페이지가 없습니다.");
-          hasMorePages = false; // 더 이상 페이지가 없으면 루프 종료
+          hasMorePages = false;
         }
       }
 
@@ -175,7 +168,7 @@ module.exports = {
     } catch (error) {
       console.error("Error during web scraping:", error);
     } finally {
-      await prisma.$disconnect(); // Prisma 연결 종료
+      await prisma.$disconnect();
     }
   },
 
