@@ -57,7 +57,49 @@ const authController = new AuthController(authServices);
  *               password: "password123"
  */
 
+/**
+ * @swagger
+ * /auth/auth-code:
+ *   post:
+ *     summary: 인증 코드 전송
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             example:
+ *               email: "example@example.com"
+ */
+
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   get:
+ *     summary: 인증 코드 검증
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         description: 이메일 주소
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         description: 인증 코드
+ *         schema:
+ *           type: string
+ */
+
 authRouter.post("/sign-up", authController.signUp);
 authRouter.post("/sign-in", authController.signIn);
+authRouter.post("/auth-code", authController.sendVerificationEmail);
+authRouter.get("/verify-email", authController.verifyEmail);
 
-export { authRouter };
+export { authRouter }; 

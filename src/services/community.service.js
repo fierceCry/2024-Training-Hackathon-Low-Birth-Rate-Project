@@ -17,7 +17,7 @@ export class CommunityServices {
   }
 
   // 모든 커뮤니티 가져오기 (페이지네이션 지원)
-  async getAllcreateCommunity(page = 1, limit = 10) {
+  async getAllcreateCommunity(page = 1, limit = 100) {
     const skip = (page - 1) * limit;
     return this.prisma.community.findMany({
       skip,

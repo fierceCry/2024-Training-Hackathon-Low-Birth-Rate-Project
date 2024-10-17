@@ -1,6 +1,6 @@
 export class CommunityRepository {
-  constructor(communityModel) {
-    this.communityModel = communityModel;
+  constructor(prisma) {
+    this.prisma = prisma;
   }
   async createCommunity({ userId, title, content }) {
     const data = new this.communityModel({
@@ -12,28 +12,30 @@ export class CommunityRepository {
   }
 
   async findAllCommunity({ page, limit }) {
-    return this.communityModel
-      .find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+    return this.prisma.birthSupportData.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc', // 내림차순 정렬
+      },
+    });
   }
-
+  
   async getCommunityById({ id }) {
     return this.communityModel.findById({ _id: id });
   }
 
-  async updateCommunityById({ userId, id, title, content }) {
-    const updateData = {
-      title,
-      content,
-      userId,
-    };
+  // async updateCommunityById({ userId, id, title, content }) {
+  //   const updateData = {
+  //     title,
+  //     content,
+  //     userId,
+  //   };
 
-    return this.communityModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
-  }
+  //   return this.communityModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+  // }
 
-  async deleteCommunityById({ userId, id }) {
-    return this.communityModel.findByIdAndDelete(id, userId).exec();
-  }
+  // async deleteCommunityById({ userId, id }) {
+  //   return this.communityModel.findByIdAndDelete(id, userId).exec();
+  // }
 }
