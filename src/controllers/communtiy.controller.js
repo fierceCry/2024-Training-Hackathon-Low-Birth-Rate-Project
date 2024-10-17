@@ -22,7 +22,7 @@ export class CommunityController {
 
   getAllcreateCommunity = async (req, res, next) => {
     try {
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 200 } = req.query;
       const data = await this.communityServices.getAllcreateCommunity({
         page,
         limit,

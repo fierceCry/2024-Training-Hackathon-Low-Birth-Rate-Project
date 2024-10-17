@@ -7,6 +7,7 @@ export class ChatRepository {
     console.log(message)
     return this.prisma.chat.create({
       data: {
+        userId: 1,
         message
       },
     });

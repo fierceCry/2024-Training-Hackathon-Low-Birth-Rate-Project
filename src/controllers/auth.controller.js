@@ -32,4 +32,24 @@ export class AuthController {
       next(error);
     }
   };
+
+  sendVerificationEmail = async (req, res, next) => {
+    try{
+      const { email } = req.body;
+      await this.authServices.sendVerificationEmail({email})
+      return res.status(HTTP_STATUS.CREATED).json({message: '인증코드 발송되었습니다.'})
+    }catch(error){
+      next(error)
+    }
+  }
+
+  verifyEmail = async (req, res, next) => {
+    try{
+      const { email, verifyCode } = req.query;
+      await this.authServices.verifyEmail({email, verifyCode})
+      return res.status(HTTP_STATUS.OK).json({message: '인증코드가 일치합니다.'})
+    }catch(error){
+      next(error)
+    }
+  }
 }
