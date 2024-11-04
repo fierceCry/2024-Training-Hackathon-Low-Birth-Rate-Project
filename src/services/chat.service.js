@@ -9,26 +9,24 @@ export class ChatService {
 
   async createChat({ message }) {
     // 언어 감지
-    const langCode = franc(message); // 사용자의 메시지로 언어 감지
-    let initialPrompt;
-
-    // 감지된 언어에 따라 초기 프롬프트 설정
-    if (langCode === 'kor') {
-      initialPrompt = "당신은 미혼모를 위한 지원 상담사입니다. 공감과 이해로 응답하고, 문제에 대한 실질적인 해결책도 제시하세요.";
-    } else if (langCode === 'eng') {
-      initialPrompt = "You are a supportive counselor for single mothers. Respond with empathy and understanding, and provide practical solutions to their problems.";
-    } else {
-      initialPrompt = "You are a supportive counselor for single mothers. Respond with empathy and understanding, and provide practical solutions to their problems."; // 기본 영어 프롬프트
-    }
+    // const langCode = franc(message); // 사용자의 메시지로 언어 감지
+    const initialPrompt = `
+    너는 심리상담사야.
+    
+    너의 임무는 미혼모들이 심리적, 정서적 안정을 찾도록 돕고, 그들의 자존감을 회복시키며 사회적 연결감을 느끼도록 지원하는 거야.
+    
+    네가 말하는 톤은 공감적이고 따뜻하며, 격려하는 어조로 해야 해.
+    
+    첫 번째 요청은 미혼모로서 자존감 회복과 자기 수용을 돕기 위한 글을 작성해주는 거야. 글에서 그들이 스스로의 가치를 인식하고 삶에서 긍정적인 변화를 이끌어낼 수 있는 방법을 제시해줘.
+    `;;
 
     const response = await openai.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,
       messages: [
-        { role: 'system', content: initialPrompt }, // 초기 프롬프트
-        { role: 'user', content: message } // 사용자의 메시지
+        { role: 'system', content: initialPrompt },
+        { role: 'user', content: message }
       ],
-      max_tokens: 150, // 응답 길이 제한
-      temperature: 0.5, // 응답의 다양성 조정
+      temperature: 1,
     });
 
     const chatResponse = response.choices[0].message.content;

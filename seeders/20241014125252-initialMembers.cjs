@@ -26,13 +26,15 @@ module.exports = {
         // 현재 페이지 데이터 크롤링
         const items = await page.evaluate(() => {
           const rows = Array.from(
-            document.querySelectorAll(".table_type01.hnone.scroll.text_center.mb30 tbody tr"),
+            document.querySelectorAll(".board.boardlist.responsive.t_center tbody tr"),
           );
+          console.log(1);
+          console.log(rows);
           return rows
             .map((row) => {
-              const numberElement = row.querySelector("td:nth-child(1)");
-              const titleElement = row.querySelector("td.tal a");
-              const viewCountElement = row.querySelector("td:nth-child(3)");
+              const numberElement = row.querySelector("td.divide");
+              const titleElement = row.querySelector("td.t_left.divide.t_con a");
+              const viewCountElement = row.querySelector("td:nth-child(3) .tx_blue");
               const registrationDateElement = row.querySelector("td:nth-child(4)");
               const onclick = titleElement ? titleElement.getAttribute("onclick") : null;
 
@@ -69,11 +71,9 @@ module.exports = {
 
               const detailData = await page.evaluate(() => {
                 let title =
-                  document.querySelector(".sub_contents_wrap .contents .text-bbsbox .bbstitle")
-                    ?.innerText || "No Title";
+                  document.querySelector(".board_detail .title-box h3")?.innerText || "No Title"; // 제목 선택
                 let content =
-                  document.querySelector(".sub_contents_wrap .contents .text-bbsbox .textview")
-                    ?.innerText || "No Content";
+                  document.querySelector(".board_detail .content")?.innerText || "No Content"; // 내용 선택
 
                 // 제목을 공백으로 분할
                 const titleParts = title.split(" ");
