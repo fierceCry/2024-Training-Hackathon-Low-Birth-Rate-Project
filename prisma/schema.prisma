@@ -99,11 +99,17 @@ model Scrap {
 }
 
 model Chat {
-  id         Int       @id @default(autoincrement())
-  userId     Int       
-  message   String     @db.Text
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id           Int       @id @default(autoincrement())
+  userId       Int       
+  message      String     @db.Text
+  messageType  MessageType
+  createdAt    DateTime  @default(now()) @map("created_at")
 
   user      User       @relation(fields: [userId], references: [id])
   @@map("chat")
+}
+
+enum MessageType {
+  user
+  assistant
 }

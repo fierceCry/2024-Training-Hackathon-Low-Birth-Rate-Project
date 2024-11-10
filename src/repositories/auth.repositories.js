@@ -30,7 +30,6 @@ export class AuthRepository {
   }
 
   async createToken({ userId, hashRefreshToken }) {
-    console.log(hashRefreshToken)
     return this.prisma.refreshToken.upsert({
       where: {
         userId: userId,

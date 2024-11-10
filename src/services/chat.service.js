@@ -1,12 +1,14 @@
 import { openai } from "../utils/open-ai.api.js";
 import { ENV_KEY } from "../constants/env.constants.js";
+import getLogger from '../common/logger.js'
 
+const logger = getLogger('chatService')
 export class ChatService {
   constructor(chatRepository) {
     this.chatRepository = chatRepository;
   }
 
-  async createChat({ message, isRespectful }) {
+  async createChat({ id, message, isRespectful }) {
     let initialPrompt;
     if (isRespectful) {
       initialPrompt = `
@@ -39,7 +41,12 @@ export class ChatService {
         **답변은 250자 이내로 작성해주세요.**
       `;
     }
-    
+    await this.chatRepository.createChat({
+      id,
+      message,
+      messageType: 'user',
+    });
+
     const response = await openai.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,
       messages: [
@@ -51,8 +58,11 @@ export class ChatService {
 
     const chatResponse = response.choices[0].message.content;
     const cleanedResponse = chatResponse.replace(/\n/g, " ");
+    logger.info(cleanedResponse)
     return this.chatRepository.createChat({
+      id,
       message: cleanedResponse,
+      messageType: 'assistant',
     });
   }
 

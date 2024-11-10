@@ -39,7 +39,7 @@ const chatRouter = express.Router();
  *                 data:
  *                   type: object
  */
-chatRouter.post("", chatController.handleChat);
+chatRouter.post("", authMiddleware, chatController.handleChat);
 chatRouter.get("/chat-user-list", authMiddleware, chatController.chatList);
 
 export { chatRouter }; 

@@ -1,5 +1,7 @@
 const puppeteer = require("puppeteer");
+const { default: getLogger } = require("../src/common/logger.js");
 
+const logger = getLogger('지원금리스트')
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -43,13 +45,12 @@ module.exports = {
             .filter((item) => item.number && item.title);
         });
 
-        console.log(items);
         allItems.push(...items);
 
         for (let item of items) {
           try {
             if (item.number === "1") {
-              console.log("item.number가 1이므로 크롤링을 종료합니다.");
+              logger.info("item.number가 1이므로 크롤링을 종료합니다.");
               hasMorePages = false;
             }
 
@@ -58,7 +59,7 @@ module.exports = {
                 const fn = new Function(onclick);
                 fn();
               }, item.onclick);
-              console.log(`Navigated to detail page for ${item.number} ${item.title}`);
+              logger.info(`Navigated to detail page for ${item.number} ${item.title}`);
               await page.waitForNavigation({ waitUntil: "networkidle2" });
 
               const detailData = await page.evaluate(() => {
@@ -85,7 +86,7 @@ module.exports = {
                 return { addressProvince, addressCity, title, details };
               });
 
-              console.log("detailData:", detailData);
+              logger.info("detailData:", detailData);
               item.detailTitle = detailData.title;
               item.detailContent = detailData.details;
               item.addressProvince = detailData.addressProvince;
@@ -159,7 +160,7 @@ module.exports = {
                     },
                   });
                 } else {
-                  console.log(`Item ${item.number} already exists in the database. Skipping.`);
+                  logger.info(`Item ${item.number} already exists in the database. Skipping.`);
                 }
               }
             }
@@ -172,12 +173,12 @@ module.exports = {
             });
 
             if (errorPage) {
-              console.log(`Error page encountered when going back from ${item.title}. Skipping...`);
+              logger.info(`Error page encountered when going back from ${item.title}. Skipping...`);
               await page.goBack({ waitUntil: "networkidle2" });
               continue;
             }
           } catch (error) {
-            console.log(`Error processing item ${item.number}, ${item.title}:`, error);
+            logger.info(`Error processing item ${item.number}, ${item.title}:`, error);
             continue;
           }
         }
@@ -204,7 +205,7 @@ module.exports = {
           };
         }, currentPage);
 
-        console.log("Next Links:", nextPageExists);
+        logger.info("Next Links:", nextPageExists);
 
         if (nextPageExists.exists && nextPageExists.onclick) {
           await page.evaluate((onclick) => {
@@ -215,7 +216,7 @@ module.exports = {
           await page.waitForNavigation({ waitUntil: "networkidle2" });
           currentPage++;
         } else {
-          console.log("jsListReq가 발견되지 않았습니다. 직접 페이지 번호를 증가시킵니다.");
+          logger.info("jsListReq가 발견되지 않았습니다. 직접 페이지 번호를 증가시킵니다.");
 
           currentPage++;
           const nextPageClick = `jsListReq(${currentPage})`;
@@ -232,16 +233,16 @@ module.exports = {
           });
 
           if (noMorePages) {
-            console.log("더 이상 페이지가 없습니다.");
+            logger.info("더 이상 페이지가 없습니다.");
             hasMorePages = false;
           }
         }
       }
 
-      console.log("All Items:", allItems);
+      logger.info("All Items:", allItems);
       await browser.close();
     } catch (error) {
-      console.error("크롤링 중 오류가 발생했습니다:", error);
+      logger.info("크롤링 중 오류가 발생했습니다:", error);
     }
   },
 

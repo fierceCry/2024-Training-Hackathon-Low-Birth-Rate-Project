@@ -6,9 +6,11 @@ import { cacheManager } from "../utils/cacheManager.js";
 import { HttpError } from "../errors/http.error.js";
 import { HASH_SALT_ROUNDS } from "../constants/auth.constants.js";
 import { ENV_KEY } from "../constants/env.constants.js";
+import getLogger from "../common/logger.js";
 
 const userAuthStates = {};
 
+const logger = getLogger('auth')
 export class AuthServices {
   constructor(authRepository) {
     this.authRepository = authRepository;
@@ -76,7 +78,7 @@ export class AuthServices {
     userAuthStates[email] = { isVerified: false };
 
     const verificationCode = this.generateVerificationCode();
-    console.log(verificationCode);
+    logger.info(verificationCode);
     const smtpTransport = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -112,7 +114,6 @@ export class AuthServices {
   }
 
   generateTokens(userId) {
-    console.log(userId)
     const accessToken = jwt.sign({ id: userId }, ENV_KEY.SECRET_KEY, {
       expiresIn: ENV_KEY.ACCESS_TOKEN_EXPIRES_IN,
     });

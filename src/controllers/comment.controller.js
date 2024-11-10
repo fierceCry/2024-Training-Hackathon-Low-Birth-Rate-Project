@@ -23,7 +23,6 @@ export class CommentController {
     const { communtiyId } = req.params;
     const { content } = req.body;
     const data = await this.commentService.updateComment({ _id, communtiyId, content });
-    console.log(data);
     return res.status(HTTP_STATUS.OK).json({ message: "댓글 수정 완료되었습니다.", data });
   };
 

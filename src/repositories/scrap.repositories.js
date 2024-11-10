@@ -4,7 +4,6 @@ export class ScrapRepository {
   }
 
   async createScrap(userId, birthSupportDataId){
-    console.log(birthSupportDataId)
     await this.prisma.birthSupportData.update({
       where: {
         id: +birthSupportDataId,
