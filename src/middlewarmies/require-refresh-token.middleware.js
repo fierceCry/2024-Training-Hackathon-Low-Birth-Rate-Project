@@ -39,7 +39,7 @@ const refreshTokenMiddleware = async (req, res, next) => {
     }
 
     const { id } = payload;
-    const user = await authRepository.findUserById(id);
+    const user = await authRepository.findUserById({id});
     if (!user) {
       throw new HttpError.NotFound("인증 정보와 일치하는 사용자가 없습니다.");
     }

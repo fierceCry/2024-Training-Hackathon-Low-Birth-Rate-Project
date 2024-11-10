@@ -21,9 +21,9 @@ export class AuthServices {
 
     const userState = userAuthStates[email];
 
-    if (!userState || !userState.isVerified) {
-      throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
-    }
+    // if (!userState || !userState.isVerified) {
+    //   throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
+    // }
 
     const user = await this.authRepository.findUserByEmail({ email });
     if (user) {
@@ -62,7 +62,7 @@ export class AuthServices {
       throw new HttpError.Unauthorized("비밀번호가 일치하지 않습니다.");
     }
 
-    const { accessToken, refreshToken, hashRefreshToken } = this.generateTokens(user._id);
+    const { accessToken, refreshToken, hashRefreshToken } = this.generateTokens(user.id);
 
     await this.authRepository.createToken({ userId: user.id, hashRefreshToken });
     return { accessToken, refreshToken };
@@ -112,6 +112,7 @@ export class AuthServices {
   }
 
   generateTokens(userId) {
+    console.log(userId)
     const accessToken = jwt.sign({ id: userId }, ENV_KEY.SECRET_KEY, {
       expiresIn: ENV_KEY.ACCESS_TOKEN_EXPIRES_IN,
     });

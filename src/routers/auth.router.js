@@ -15,7 +15,7 @@ const authController = new AuthController(authServices);
  * /auth/sign-up:
  *   post:
  *     summary: 회원가입
- *     tags: [Auth]
+ *     tags: [인증]
  *     requestBody:
  *       required: true
  *       content:
@@ -40,7 +40,7 @@ const authController = new AuthController(authServices);
  * /auth/sign-in:
  *   post:
  *     summary: 로그인
- *     tags: [Auth]
+ *     tags: [인증]
  *     requestBody:
  *       required: true
  *       content:
@@ -62,7 +62,7 @@ const authController = new AuthController(authServices);
  * /auth/auth-code:
  *   post:
  *     summary: 인증 코드 전송
- *     tags: [Auth]
+ *     tags: [인증]
  *     requestBody:
  *       required: true
  *       content:
@@ -81,7 +81,7 @@ const authController = new AuthController(authServices);
  * /auth/verify-email:
  *   get:
  *     summary: 인증 코드 검증
- *     tags: [Auth]
+ *     tags: [인증]
  *     parameters:
  *       - in: query
  *         name: email

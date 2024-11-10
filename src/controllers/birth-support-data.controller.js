@@ -7,7 +7,7 @@ export class BirthSupportDataController {
 
   getAllBirthSupportData = async (req, res, next) => {
     try {
-      const { addressProvince, addressCity, page = 1, limit = 10 } = req.query;
+      const { addressProvince, addressCity, page = 1, limit = 10, sortBy = "desc" } = req.query;
 
       const offset = (page - 1) * limit;
 
@@ -18,27 +18,29 @@ export class BirthSupportDataController {
       if (addressCity) {
         whereClause.addressCity = addressCity;
       }
-      const result = await this.birthSupportDataService.getAllBirthSupportData(
+
+      const result = await this.birthSupportDataService.getAllBirthSupportData({
         whereClause,
         limit,
         offset,
-      );
+        sortBy,
+      });
+
       return res.status(HTTP_STATUS.OK).json({ data: result });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   };
 
   getBirthSupportDataById = async (req, res, next) => {
     try {
       const { birthSupportDataId } = req.params;
-      console.log(birthSupportDataId);
       const result = await this.birthSupportDataService.getBirthSupportDataById({
         birthSupportDataId,
       });
       return res.status(HTTP_STATUS.OK).json({ data: result });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   };
 }

@@ -9,9 +9,9 @@ import { birthSupportDataRouter } from "./birth-support-data.router.js";
 const router = express.Router();
 
 router.use("/auth", authRouter);
+router.use("/birth-support-data", birthSupportDataRouter);
 router.use("/comment", commentRouter);
 router.use("/reply", replyRouter);
 router.use("/chat", chatRouter);
 router.use("/scrap", scrapRouter);
-router.use("/birthSupportData", birthSupportDataRouter);
 export { router };

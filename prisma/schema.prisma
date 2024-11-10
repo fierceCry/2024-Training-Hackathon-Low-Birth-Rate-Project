@@ -33,18 +33,30 @@ model RefreshToken {
 }
 
 model BirthSupportData {
-  id                        Int            @id @default(autoincrement())
-  number                    String
-  title                     String
-  registrationDate          String         @map("registration_date")
-  addressProvince           String         @map("address_province")
-  addressCity               String         @map("address_city")
-  detailContent             String         @db.Text @map("detail_content")
-  createdAt                 DateTime       @default(now()) @map("created_at")
-  updatedAt                 DateTime       @updatedAt  @map("updated_at")
-  deletedAt                 DateTime?      @map("deleted_at")
+  id                        Int            @id @default(autoincrement())               // 고유 ID
+  number                    String                                                     // 지원 프로그램 번호
+  title                     String         @db.Text                                             // 지원 프로그램 제목
+  registrationDate          String         @map("registration_date")                   // 등록일
+  addressProvince           String         @map("address_province")                    // 주소 (도)
+  addressCity               String         @map("address_city")                        // 주소 (시/군/구)
+  viewCount                 Int?           @default(0) @map("view_count")              // 조회수
+  scrapCount                Int?            @default(0) @map("scrap_count")             // 스크랩 수
+  createdAt                 DateTime       @default(now()) @map("created_at")          // 생성일
+  updatedAt                 DateTime       @updatedAt  @map("updated_at")              // 업데이트일
+  deletedAt                 DateTime?      @map("deleted_at")                          // 삭제일 (논리 삭제)
 
-  scrap                     Scrap[]
+  // 상세 페이지의 세부 내용을 각 필드로 분리
+  supportTarget             String?        @db.Text @map("support_target")             // 지원 대상
+  supportContent            String?        @db.Text @map("support_content")            // 지원 내용
+  inquiry                   String?        @db.Text @map("inquiry")                    // 문의 방법
+  applicationMethod         String?        @db.Text @map("application_method")         // 신청 방법
+  requiredDocuments         String?        @db.Text @map("required_documents")         // 구비 서류
+  source                    String?        @db.Text @map("source")                     // 출처
+  eligibility               String?        @db.Text @map("eligibility")                // 지원 자격
+  supportAmount             String?        @db.Text @map("support_amount")             // 지원 금액
+
+  scrap                     Scrap[]                                                    // 스크랩 정보와의 관계
+
   @@map("birth_support_data")
 }
 

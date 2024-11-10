@@ -3,15 +3,14 @@ const puppeteer = require("puppeteer");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const url = "https://www.childcare.go.kr/?menuno=279"; // 크롤링할 URL
+    const url = "https://www.childcare.go.kr/?menuno=279";
 
     try {
-      const { prisma } = await import("../src/database/db.prisma.js"); // 동적 import
+      const { prisma } = await import("../src/database/db.prisma.js");
 
       const browser = await puppeteer.launch({ headless: true });
       const page = await browser.newPage();
 
-      // 브라우저의 콘솔 로그를 Node.js 콘솔로 출력
       page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
       await page.goto(url, { waitUntil: "networkidle2" });
@@ -21,15 +20,10 @@ module.exports = {
       let hasMorePages = true;
 
       while (hasMorePages) {
-        console.log(`Scraping page ${currentPage}`);
-
-        // 현재 페이지 데이터 크롤링
         const items = await page.evaluate(() => {
           const rows = Array.from(
             document.querySelectorAll(".board.boardlist.responsive.t_center tbody tr"),
           );
-          console.log(1);
-          console.log(rows);
           return rows
             .map((row) => {
               const numberElement = row.querySelector("td.divide");
@@ -52,13 +46,11 @@ module.exports = {
         console.log(items);
         allItems.push(...items);
 
-        // 각 아이템의 상세 정보를 크롤링
         for (let item of items) {
           try {
-            // item.number가 1인 경우 크롤링 후 종료
             if (item.number === "1") {
               console.log("item.number가 1이므로 크롤링을 종료합니다.");
-              hasMorePages = false; // 더 이상 페이지를 크롤링하지 않음
+              hasMorePages = false;
             }
 
             if (item.onclick) {
@@ -71,47 +63,109 @@ module.exports = {
 
               const detailData = await page.evaluate(() => {
                 let title =
-                  document.querySelector(".board_detail .title-box h3")?.innerText || "No Title"; // 제목 선택
+                  document.querySelector(".board_detail .title-box h3")?.innerText || "No Title";
                 let content =
-                  document.querySelector(".board_detail .content")?.innerText || "No Content"; // 내용 선택
+                  document.querySelector(".board_detail .content")?.innerText || "No Content";
 
-                // 제목을 공백으로 분할
                 const titleParts = title.split(" ");
+                const addressProvince = titleParts[0];
+                const addressCity = titleParts[1];
+                title = titleParts.slice(2).join(" ").trim();
+                content = content.replace(/\n/g, "").replace(/\s\s+/g, " ").trim();
 
-                // addressProvince와 addressCity에 각각 값 할당
-                const addressProvince = titleParts[0]; // 첫 번째 부분
-                const addressCity = titleParts[1]; // 두 번째 부분
+                const sections = content.match(/\[.*?\].*?(?=\[|$)/g);
+                const details = sections
+                  .map((section) => {
+                    const sectionTitle = section.match(/\[(.*?)\]/)[1];
+                    const sectionDetails = section.replace(/\[.*?\]/, "").trim();
+                    return { sectionTitle, sectionDetails };
+                  })
+                  .filter((section) => !section.sectionTitle.includes("등록일"));
 
-                // title에서 두 부분을 제거한 나머지를 다시 합침
-                title = titleParts.slice(2).join(" ").trim(); // 필요한 경우에 따라 title 수정
-
-                content = content.replace(/\n/g, "<br>").replace(/\s\s+/g, " ").trim();
-
-                return { addressProvince, addressCity, title, content };
+                return { addressProvince, addressCity, title, details };
               });
 
+              console.log("detailData:", detailData);
               item.detailTitle = detailData.title;
-              item.detailContent = detailData.content;
-              item.addressProvince = detailData.addressProvince; // addressProvince 추가
-              item.addressCity = detailData.addressCity; // addressCity 추가
+              item.detailContent = detailData.details;
+              item.addressProvince = detailData.addressProvince;
+              item.addressCity = detailData.addressCity;
+
+              for (let detail of detailData.details) {
+                const splitDetails = detail.sectionDetails.split(/(?=\d+\.\s)/);
+
+                let supportTarget = "";
+                let supportContent = "";
+                let inquiry = "";
+                let applicationMethod = "";
+                let requiredDocuments = "";
+                let source = "";
+                let eligibility = "";
+                let supportAmount = "";
+
+                for (let item of splitDetails) {
+                  const match = item.match(/^(\d+)\.\s*(.*)/);
+
+                  if (match) {
+                    const content = match[2].trim();
+
+                    if (content.includes("지원대상")) {
+                      supportTarget = content.replace("지원대상:", "").replace("-", "").trim();
+                    } else if (content.includes("준비사항")) {
+                      supportTarget = content.replace("준비사항:", "").replace("-", "").trim();
+                    } else if (content.includes("지원내용")) {
+                      supportContent = content.replace("지원내용:", "").replace("-", "").trim();
+                    } else if (content.includes("지원대상")) {
+                      supportContent = content.replace("지원대상:", "").replace("-", "").trim();
+                    } else if (content.includes("문의")) {
+                      inquiry = content.replace("문의:", "").replace("-", "").trim();
+                    } else if (content.includes("문의사항")) {
+                      inquiry = content.replace("문의사항:", "").replace("-", "").trim();
+                    } else if (content.includes("신청방법")) {
+                      applicationMethod = content.replace("신청방법:", "").replace("-", "").trim();
+                    } else if (content.includes("구비서류")) {
+                      requiredDocuments = content.replace("구비서류:", "").replace("-", "").trim();
+                    } else if (content.includes("출처")) {
+                      source = content.replace("출처:", "").replace("-", "").trim();
+                    } else if (content.includes("자격")) {
+                      eligibility = content.replace("자격:", "").replace("-", "").trim();
+                    } else if (content.includes("지원금액")) {
+                      supportAmount = content.replace("지원금액:", "").replace("-", "").trim();
+                    }
+                  }
+                }
+
+                // 중복 데이터 확인 후 저장
+                const existingData = await prisma.birthSupportData.findUnique({
+                  where: { number: item.number },
+                });
+
+                if (!existingData) {
+                  await prisma.birthSupportData.create({
+                    data: {
+                      number: item.number,
+                      title: `${item.title}(${detail.sectionTitle})`,
+                      registrationDate: item.registrationDate,
+                      addressProvince: item.addressProvince,
+                      addressCity: item.addressCity,
+                      supportTarget: supportTarget,
+                      supportContent: supportContent,
+                      inquiry: inquiry,
+                      applicationMethod: applicationMethod,
+                      requiredDocuments: requiredDocuments,
+                      source: source,
+                      eligibility: eligibility,
+                      supportAmount: supportAmount,
+                    },
+                  });
+                } else {
+                  console.log(`Item ${item.number} already exists in the database. Skipping.`);
+                }
+              }
             }
 
-            // 데이터베이스에 저장
-            await prisma.birthSupportData.create({
-              data: {
-                number: item.number,
-                title: item.title,
-                registrationDate: item.registrationDate,
-                addressProvince: item.addressProvince, // addressProvince 저장
-                addressCity: item.addressCity, // addressCity 저장
-                detailContent: item.detailContent,
-              },
-            });
-
-            // 이전 페이지로 돌아오기
             await page.goBack({ waitUntil: "networkidle2" });
 
-            // 오류 페이지 확인
             const errorPage = await page.evaluate(() => {
               const errorElement = document.getElementById("main-frame-error");
               return errorElement ? true : false;
@@ -128,7 +182,6 @@ module.exports = {
           }
         }
 
-        // 다음 페이지로 이동하는 로직
         const nextPageExists = await page.evaluate((currentPage) => {
           const nextLinks = Array.from(document.querySelectorAll(".paging.mb30 a"));
           const result = [];
@@ -137,7 +190,6 @@ module.exports = {
             const onclick = link.getAttribute("onclick");
             const pageNumber = parseInt(link.innerText);
 
-            // 첫 페이지와 이전 페이지는 건너뜀
             if (onclick && onclick.includes("jsListReq") && pageNumber > currentPage) {
               result.push({
                 text: link.innerText,
@@ -152,33 +204,28 @@ module.exports = {
           };
         }, currentPage);
 
-        console.log("Next Links:", nextPageExists); // nextLinks와 onclick 값 출력
+        console.log("Next Links:", nextPageExists);
 
         if (nextPageExists.exists && nextPageExists.onclick) {
-          // 다음 페이지로 이동
           await page.evaluate((onclick) => {
             const fn = new Function(onclick);
             fn();
           }, nextPageExists.onclick);
 
-          // 페이지 로드 완료까지 대기
           await page.waitForNavigation({ waitUntil: "networkidle2" });
           currentPage++;
         } else {
           console.log("jsListReq가 발견되지 않았습니다. 직접 페이지 번호를 증가시킵니다.");
 
-          // 다음 페이지가 없으면 onclick 속성을 사용하여 페이지 번호 증가
           currentPage++;
-          const nextPageClick = `jsListReq(${currentPage})`; // 다음 페이지 클릭을 위한 함수 호출 생성
+          const nextPageClick = `jsListReq(${currentPage})`;
           await page.evaluate((click) => {
             const fn = new Function(click);
             fn();
           }, nextPageClick);
 
-          // 페이지 로드 완료까지 대기
           await page.waitForNavigation({ waitUntil: "networkidle2" });
 
-          // 더 이상 페이지가 없으면 루프 종료
           const noMorePages = await page.evaluate(() => {
             const noDataMessage = document.querySelector(".no_data");
             return noDataMessage ? true : false;
@@ -194,9 +241,7 @@ module.exports = {
       console.log("All Items:", allItems);
       await browser.close();
     } catch (error) {
-      console.error("Error during web scraping:", error);
-    } finally {
-      await prisma.$disconnect(); // Prisma 연결 종료
+      console.error("크롤링 중 오류가 발생했습니다:", error);
     }
   },
 

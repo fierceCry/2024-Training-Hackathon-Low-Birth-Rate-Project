@@ -1,10 +1,22 @@
 export class ScrapRepository {
-  constructor(primsa){
-    this.primsa = primsa
+  constructor(prisma){
+    this.prisma = prisma
   }
 
   async createScrap(userId, birthSupportDataId){
-    return this.primsa.scrap.create({
+    console.log(birthSupportDataId)
+    await this.prisma.birthSupportData.update({
+      where: {
+        id: +birthSupportDataId,
+      },
+      data: {
+        scrapCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    return this.prisma.scrap.create({
       data: {
         userId,
         birthSupportDataId
@@ -12,9 +24,9 @@ export class ScrapRepository {
     })
   }
 
-  async getUserScraps(userId){
-    return this.primsa.scrap.findMany({
-      where: { userId },
+  async getUserScraps({id}){
+    return this.prisma.scrap.findMany({
+      where: { userId: id },
       include: {
         birthSupportData: true
       }
