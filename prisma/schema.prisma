@@ -48,12 +48,16 @@ model BirthSupportData {
   // 상세 페이지의 세부 내용을 각 필드로 분리
   supportTarget             String?        @db.Text @map("support_target")             // 지원 대상
   supportContent            String?        @db.Text @map("support_content")            // 지원 내용
-  inquiry                   String?        @db.Text @map("inquiry")                    // 문의 방법
-  applicationMethod         String?        @db.Text @map("application_method")         // 신청 방법
+  inquiryContact            String?        @db.Text @map("inquiry_contact")            // 문의처
+  inquiryDetail             String?        @db.Text @map("inquiry_detail")             // 문의
+  applicationMethod         String?        @db.Text @map("application_method")         // 신청 자격
   requiredDocuments         String?        @db.Text @map("required_documents")         // 구비 서류
   source                    String?        @db.Text @map("source")                     // 출처
   eligibility               String?        @db.Text @map("eligibility")                // 지원 자격
   supportAmount             String?        @db.Text @map("support_amount")             // 지원 금액
+  applicationPeriod         String?        @db.Text @map("application_period")         // 신청기간
+  applicationMethodDetail   String?        @db.Text @map("application_method_detail")  // 신청방법
+  supportItems              String?        @db.Text @map("support_items")              // 지원품목
 
   scrap                     Scrap[]                                                    // 스크랩 정보와의 관계
 

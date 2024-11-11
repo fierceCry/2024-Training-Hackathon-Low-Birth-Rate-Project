@@ -1,7 +1,5 @@
 const puppeteer = require("puppeteer");
-const { default: getLogger } = require("../src/common/logger.js");
 
-const logger = getLogger('지원금리스트')
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -50,7 +48,7 @@ module.exports = {
         for (let item of items) {
           try {
             if (item.number === "1") {
-              logger.info("item.number가 1이므로 크롤링을 종료합니다.");
+              console.log("item.number가 1이므로 크롤링을 종료합니다.");
               hasMorePages = false;
             }
 
@@ -59,7 +57,7 @@ module.exports = {
                 const fn = new Function(onclick);
                 fn();
               }, item.onclick);
-              logger.info(`Navigated to detail page for ${item.number} ${item.title}`);
+              console.log(`Navigated to detail page for ${item.number} ${item.title}`);
               await page.waitForNavigation({ waitUntil: "networkidle2" });
 
               const detailData = await page.evaluate(() => {
@@ -86,7 +84,7 @@ module.exports = {
                 return { addressProvince, addressCity, title, details };
               });
 
-              logger.info("detailData:", detailData);
+              // console.log("detailData:", detailData);
               item.detailTitle = detailData.title;
               item.detailContent = detailData.details;
               item.addressProvince = detailData.addressProvince;
@@ -95,73 +93,114 @@ module.exports = {
               for (let detail of detailData.details) {
                 const splitDetails = detail.sectionDetails.split(/(?=\d+\.\s)/);
 
-                let supportTarget = "";
-                let supportContent = "";
-                let inquiry = "";
-                let applicationMethod = "";
-                let requiredDocuments = "";
-                let source = "";
-                let eligibility = "";
-                let supportAmount = "";
+                let supportTarget = ""; // 지원대상
+                let supportContent = ""; // 지원내용
+                let inquiryContact = ""; // 문의처
+                let inquiryDetail = ""; // 문의
+                let applicationMethod = ""; // 신청자격
+                let requiredDocuments = ""; // 구비서류
+                let source = ""; // 출처
+                let eligibility = ""; // 지원자격
+                let supportAmount = ""; // 지원금액
+                let applicationPeriod = ""; // 신청기간
+                let applicationMethodDetail = ""; // 신청방법
+                let supportItems = ""; // 지원품목
 
                 for (let item of splitDetails) {
                   const match = item.match(/^(\d+)\.\s*(.*)/);
-
+                
                   if (match) {
                     const content = match[2].trim();
-
-                    if (content.includes("지원대상")) {
-                      supportTarget = content.replace("지원대상:", "").replace("-", "").trim();
-                    } else if (content.includes("준비사항")) {
-                      supportTarget = content.replace("준비사항:", "").replace("-", "").trim();
-                    } else if (content.includes("지원내용")) {
-                      supportContent = content.replace("지원내용:", "").replace("-", "").trim();
-                    } else if (content.includes("지원대상")) {
-                      supportContent = content.replace("지원대상:", "").replace("-", "").trim();
-                    } else if (content.includes("문의")) {
-                      inquiry = content.replace("문의:", "").replace("-", "").trim();
-                    } else if (content.includes("문의사항")) {
-                      inquiry = content.replace("문의사항:", "").replace("-", "").trim();
-                    } else if (content.includes("신청방법")) {
-                      applicationMethod = content.replace("신청방법:", "").replace("-", "").trim();
-                    } else if (content.includes("구비서류")) {
-                      requiredDocuments = content.replace("구비서류:", "").replace("-", "").trim();
-                    } else if (content.includes("출처")) {
-                      source = content.replace("출처:", "").replace("-", "").trim();
-                    } else if (content.includes("자격")) {
-                      eligibility = content.replace("자격:", "").replace("-", "").trim();
-                    } else if (content.includes("지원금액")) {
-                      supportAmount = content.replace("지원금액:", "").replace("-", "").trim();
+                
+                    // 지원대상
+                    if (content.startsWith("지원대상")) {
+                      supportTarget = content.replace(/^지원대상\s*:\s*/, "").trim();
+                    }
+                    // 지원내용
+                    else if (content.startsWith("지원내용")) {
+                      supportContent = content.replace(/^지원내용\s*:\s*/, "").trim();
+                    }
+                    // 지원금액
+                    else if (content.startsWith("지원금액")) {
+                      supportAmount = content.replace(/^지원금액\s*:\s*/, "").trim();
+                    }
+                    // 신청기간
+                    else if (content.startsWith("신청기간")) {
+                      applicationPeriod = content.replace(/^신청기간\s*:\s*/, "").trim();
+                    }
+                    // 신청방법
+                    else if (content.startsWith("신청방법")) {
+                      applicationMethodDetail = content.replace(/^신청방법\s*:\s*/, "").trim();
+                    }
+                    // 문의처
+                    else if (content.startsWith("문의처")) {
+                      inquiryContact = content.replace(/^문의처\s*:\s*/, "").trim();
+                    }
+                    // 문의
+                    else if (content.startsWith("문의")) {
+                      inquiryDetail = content.replace(/^문의\s*:\s*/, "").trim();
+                    }
+                    // 지원자격
+                    else if (content.startsWith("지원자격")) {
+                      eligibility = content.replace(/^지원자격\s*:\s*/, "").trim();
+                    }
+                    // 지원품목
+                    else if (content.startsWith("지원품목")) {
+                      supportItems = content.replace(/^지원품목\s*:\s*/, "").trim();
+                    }
+                    // 구비서류
+                    else if (content.startsWith("구비서류")) {
+                      requiredDocuments = content.replace(/^구비서류\s*:\s*/, "").trim();
+                    }
+                    // 출처
+                    else if (content.startsWith("출처")) {
+                      source = content.replace(/^출처\s*:\s*/, "").trim();
                     }
                   }
                 }
+                
+
+                // console.log('detail.sectionTitle',detail.sectionTitle)
+                // console.log('supportTarget', supportTarget)
+                // console.log('supportContent', supportContent)
+                // console.log('inquiry', inquiry)
+                // console.log('applicationMethod', applicationMethod)
+                // console.log('requiredDocuments'. requiredDocuments)
+                // console.log('source'. source)
+                // console.log('eligibility'. eligibility)
+                // console.log('supportAmount'. supportAmount)
 
                 // 중복 데이터 확인 후 저장
-                const existingData = await prisma.birthSupportData.findUnique({
-                  where: { number: item.number },
-                });
+                // const existingData = await prisma.birthSupportData.findFirst({
+                //   where: { title: `${item.title}(${detail.sectionTitle})` },
+                // });
 
-                if (!existingData) {
-                  await prisma.birthSupportData.create({
-                    data: {
-                      number: item.number,
-                      title: `${item.title}(${detail.sectionTitle})`,
-                      registrationDate: item.registrationDate,
-                      addressProvince: item.addressProvince,
-                      addressCity: item.addressCity,
-                      supportTarget: supportTarget,
-                      supportContent: supportContent,
-                      inquiry: inquiry,
-                      applicationMethod: applicationMethod,
-                      requiredDocuments: requiredDocuments,
-                      source: source,
-                      eligibility: eligibility,
-                      supportAmount: supportAmount,
-                    },
-                  });
-                } else {
-                  logger.info(`Item ${item.number} already exists in the database. Skipping.`);
-                }
+                // if (!existingData) {
+                const data = await prisma.birthSupportData.create({
+                  data: {
+                    number: item.number,
+                    title: `${item.title}(${detail.sectionTitle})`,
+                    registrationDate: item.registrationDate,
+                    addressProvince: item.addressProvince,
+                    addressCity: item.addressCity,
+                    supportTarget: supportTarget, // 지원대상
+                    supportContent: supportContent, // 지원내용
+                    inquiryContact: inquiryContact, // 문의처
+                    inquiryDetail: inquiryDetail, // 문의
+                    applicationMethod: applicationMethod, // 신청자격
+                    requiredDocuments: requiredDocuments, // 구비서류
+                    source: source, // 출처
+                    eligibility: eligibility, // 지원자격
+                    supportAmount: supportAmount, // 지원금액
+                    applicationPeriod: applicationPeriod, // 신청기간
+                    applicationMethodDetail: applicationMethodDetail, // 신청방법
+                    supportItems: supportItems, // 지원품목
+                  },
+                });
+                console.log(data);
+                // } else {
+                //   console.log(`Item ${item.number} already exists in the database. Skipping.`);
+                // }
               }
             }
 
@@ -173,12 +212,12 @@ module.exports = {
             });
 
             if (errorPage) {
-              logger.info(`Error page encountered when going back from ${item.title}. Skipping...`);
+              console.log(`Error page encountered when going back from ${item.title}. Skipping...`);
               await page.goBack({ waitUntil: "networkidle2" });
               continue;
             }
           } catch (error) {
-            logger.info(`Error processing item ${item.number}, ${item.title}:`, error);
+            console.log(`Error processing item ${item.number}, ${item.title}:`, error);
             continue;
           }
         }
@@ -205,7 +244,7 @@ module.exports = {
           };
         }, currentPage);
 
-        logger.info("Next Links:", nextPageExists);
+        console.log("Next Links:", nextPageExists);
 
         if (nextPageExists.exists && nextPageExists.onclick) {
           await page.evaluate((onclick) => {
@@ -216,7 +255,7 @@ module.exports = {
           await page.waitForNavigation({ waitUntil: "networkidle2" });
           currentPage++;
         } else {
-          logger.info("jsListReq가 발견되지 않았습니다. 직접 페이지 번호를 증가시킵니다.");
+          console.log("jsListReq가 발견되지 않았습니다. 직접 페이지 번호를 증가시킵니다.");
 
           currentPage++;
           const nextPageClick = `jsListReq(${currentPage})`;
@@ -233,16 +272,16 @@ module.exports = {
           });
 
           if (noMorePages) {
-            logger.info("더 이상 페이지가 없습니다.");
+            console.log("더 이상 페이지가 없습니다.");
             hasMorePages = false;
           }
         }
       }
 
-      logger.info("All Items:", allItems);
+      console.log("All Items:", allItems);
       await browser.close();
     } catch (error) {
-      logger.info("크롤링 중 오류가 발생했습니다:", error);
+      console.log("크롤링 중 오류가 발생했습니다:", error);
     }
   },
 
