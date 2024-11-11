@@ -10,5 +10,21 @@ const usersRepository = new UsersRepository(prisma);
 const usersService = new UsersService(usersRepository);
 const usersController = new UsersController(usersService);
 
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: 사용자의 정보 조회
+ *     description: JWT 토큰을 사용하여 사용자의 정보를 조회합니다.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 사용자 정보가 성공적으로 반환되었습니다.
+ *       401:
+ *         description: 인증 실패 (토큰 없음 또는 유효하지 않음)
+ *       500:
+ *         description: 서버 오류
+ */
 usersRouter.get('', authMiddleware, usersController.findUsers)
 export { usersRouter };

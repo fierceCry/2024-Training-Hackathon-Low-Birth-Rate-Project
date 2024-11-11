@@ -7,10 +7,10 @@ export class ChatController {
 
   handleChat = async (req, res, next) => {
     try {
-      const { id } = req.user
-      const { message, isRespectful } = req.body;
+      // const { id } = req.user
+      const { message, isRespectful= true } = req.body;
       const chatResponse = await this.chatService.createChat({
-        id,
+        // id,
         message,
         isRespectful,
       });

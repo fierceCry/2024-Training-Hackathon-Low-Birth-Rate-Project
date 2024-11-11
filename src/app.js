@@ -7,6 +7,9 @@ import { swaggerSpec } from "./utils/swagger.js";
 import swaggerUi from "swagger-ui-express";
 
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+app.use(express.static('public'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -16,6 +19,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/api", (req, res) => {
   return res.status(HTTP_STATUS.OK).json({ message: "테스트 성공하였습니다." });
+});
+
+app.get("/chat-test", (req, res) => {
+  res.render("index");
 });
 
 (async () => {
