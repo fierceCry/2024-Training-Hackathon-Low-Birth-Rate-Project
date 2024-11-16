@@ -2,18 +2,19 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import nodemailer from "nodemailer";
-import { cacheManager } from "../utils/cacheManager.js";
 import { HttpError } from "../errors/http.error.js";
 import { HASH_SALT_ROUNDS } from "../constants/auth.constants.js";
 import { ENV_KEY } from "../constants/env.constants.js";
 import getLogger from "../common/logger.js";
+import NodeCache from "node-cache";
 
 const userAuthStates = {};
 
-const logger = getLogger('auth')
+const logger = getLogger('AuthServices')
 export class AuthServices {
   constructor(authRepository) {
     this.authRepository = authRepository;
+    this.cache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
   }
 
   async signUp({ email, password, name }) {
@@ -23,9 +24,9 @@ export class AuthServices {
 
     const userState = userAuthStates[email];
 
-    // if (!userState || !userState.isVerified) {
-    //   throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
-    // }
+    if (!userState || !userState.isVerified) {
+      throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
+    }
 
     const user = await this.authRepository.findUserByEmail({ email });
     if (user) {
@@ -51,6 +52,10 @@ export class AuthServices {
   }
 
   async signIn({ email, password }) {
+    if(!email || !password){
+      throw new HttpError.BadRequest('email, password 값을 확인해주세요.');
+    }
+
     const user = await this.authRepository.findUserByEmail({
       email,
     });
@@ -71,6 +76,7 @@ export class AuthServices {
   }
 
   async sendVerificationEmail({ email }) {
+    logger.info('email',email)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new HttpError.BadRequest("유효하지 않은 이메일 형식입니다.");
@@ -78,7 +84,7 @@ export class AuthServices {
     userAuthStates[email] = { isVerified: false };
 
     const verificationCode = this.generateVerificationCode();
-    logger.info(verificationCode);
+    logger.info('verificationCode',verificationCode);
     const smtpTransport = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -95,22 +101,35 @@ export class AuthServices {
         <p>${verificationCode}</p>
         `,
     };
-    cacheManager.set(email, verificationCode);
+    this.cache.set(email, verificationCode);
     smtpTransport.sendMail(mailOptions);
   }
 
   async verifyEmail({ email, verifyCode }) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new HttpError.BadRequest("유효하지 않은 이메일 형식입니다.");
+    if(!email || !verifyCode){
+      throw new HttpError.BadRequest('email, verifyCdoe 값을 확인해주세요.');
     }
-    const code = cacheManager.get(email);
+    const code = this.cache.get(email);
+    logger.info('code',code)
 
     if (code !== verifyCode) {
       throw new HttpError.NotFound("인증코드가 일치하지 않습니다.");
     }
     userAuthStates[email].isVerified = true;
-    cacheManager.delete(email);
+    this.cache.del(email);
+  }
+
+  async verifyNickname(nickname){
+    if(!nickname){
+      throw new HttpError.BadRequest('nickname 값을 확인해주세요.');
+    }
+    logger.info('nickname', nickname)
+    const user = await this.authRepository.findByUserName({name: nickname})
+    if(user){
+      throw new HttpError.NotFound('사용중인 닉네임입니다.')
+    }
+
+    return null;
   }
 
   generateTokens(userId) {

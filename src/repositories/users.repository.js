@@ -3,7 +3,7 @@ export class UsersRepository {
     this.prisma = prisma;
   }
 
-  async findUsers(id) {
+  async findUserId(id) {
     return this.prisma.user.findUnique({
       where: { id },
     });

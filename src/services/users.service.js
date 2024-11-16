@@ -4,6 +4,6 @@ export class UsersService {
   }
    
   async findUsers(id){
-    return this.usersRepository.findUsers(id)
+    return this.usersRepository.findUserId(id)
   }
 }

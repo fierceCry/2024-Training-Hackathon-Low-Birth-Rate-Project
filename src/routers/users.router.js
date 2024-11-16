@@ -15,6 +15,7 @@ const usersController = new UsersController(usersService);
  * /users:
  *   get:
  *     summary: 사용자의 정보 조회
+ *     tags: [유저]
  *     description: JWT 토큰을 사용하여 사용자의 정보를 조회합니다.
  *     security:
  *       - bearerAuth: []

@@ -17,7 +17,6 @@ model User {
   deletedAt     DateTime?      @map("deleted_at")
   
   refreshTokens RefreshToken[]
-  comments      Comment[]
   chat          Chat[]
   scrap         Scrap[]
   @@map("user")
@@ -62,33 +61,6 @@ model BirthSupportData {
   scrap                     Scrap[]                                                    // 스크랩 정보와의 관계
 
   @@map("birth_support_data")
-}
-
-model Comment {
-  id          Int       @id @default(autoincrement())
-  content     String
-  userId      Int       @map("user_id")
-  communityId Int       @map("commmunity_id")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-  replies     Reply[]
-
-  user        User      @relation(fields: [userId], references: [id])
-
-  @@map("comment")
-}
-
-model Reply {
-  id         Int       @id @default(autoincrement())
-  text       String
-  commentId  Int       @map("comment_id")
-  createdAt  DateTime  @default(now())  @map("created_at")  
-  updatedAt  DateTime  @updatedAt       @map("updated_at")
-
-  comment    Comment   @relation(fields: [commentId], references: [id])
-
-  @@map("reply")
 }
 
 model Scrap {

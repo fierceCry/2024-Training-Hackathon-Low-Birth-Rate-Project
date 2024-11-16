@@ -9,8 +9,6 @@ export class BirthSupportDataController {
     try {
       const { addressProvince, addressCity, page = 1, limit = 10, sortBy = "desc" } = req.query;
 
-      const offset = (page - 1) * limit;
-
       const whereClause = {};
       if (addressProvince) {
         whereClause.addressProvince = addressProvince;
@@ -22,10 +20,10 @@ export class BirthSupportDataController {
       const result = await this.birthSupportDataService.getAllBirthSupportData({
         whereClause,
         limit,
-        offset,
+        page,
         sortBy,
       });
-
+      
       return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {
       next(error);

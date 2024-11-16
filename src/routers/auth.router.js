@@ -90,16 +90,47 @@ const authController = new AuthController(authServices);
  *         schema:
  *           type: string
  *       - in: query
- *         name: code
+ *         name: verifyCode
  *         required: true
  *         description: 인증 코드
  *         schema:
  *           type: string
  */
 
+/**
+ * @swagger
+ * /auth/verify-nickname:
+ *   get:
+ *     summary: 닉네임 중복 확인
+ *     description: 사용자가 입력한 닉네임이 중복되는지 확인합니다.
+ *     tags: [인증]
+ *     parameters:
+ *       - in: query
+ *         name: nickname
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: 확인할 닉네임
+ *     responses:
+ *       200:
+ *         description: 닉네임이 사용 가능한 경우
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isAvailable:
+ *                   type: boolean
+ *                   description: 닉네임 사용 가능 여부
+ *       400:
+ *         description: 유효하지 않은 요청 (닉네임 미입력 등)
+ *       500:
+ *         description: 서버 오류
+ */
+
 authRouter.post("/sign-up", authController.signUp);
 authRouter.post("/sign-in", authController.signIn);
 authRouter.post("/auth-code", authController.sendVerificationEmail);
 authRouter.get("/verify-email", authController.verifyEmail);
-
-export { authRouter }; 
+authRouter.get("/verify-nickname", authController.verifyNickname);
+export { authRouter };

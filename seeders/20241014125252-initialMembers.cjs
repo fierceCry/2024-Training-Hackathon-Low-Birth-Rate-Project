@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async () => {
     const url = "https://www.childcare.go.kr/?menuno=279";
 
     try {
@@ -84,7 +84,6 @@ module.exports = {
                 return { addressProvince, addressCity, title, details };
               });
 
-              // console.log("detailData:", detailData);
               item.detailTitle = detailData.title;
               item.detailContent = detailData.details;
               item.addressProvince = detailData.addressProvince;
@@ -159,23 +158,6 @@ module.exports = {
                   }
                 }
                 
-
-                // console.log('detail.sectionTitle',detail.sectionTitle)
-                // console.log('supportTarget', supportTarget)
-                // console.log('supportContent', supportContent)
-                // console.log('inquiry', inquiry)
-                // console.log('applicationMethod', applicationMethod)
-                // console.log('requiredDocuments'. requiredDocuments)
-                // console.log('source'. source)
-                // console.log('eligibility'. eligibility)
-                // console.log('supportAmount'. supportAmount)
-
-                // 중복 데이터 확인 후 저장
-                // const existingData = await prisma.birthSupportData.findFirst({
-                //   where: { title: `${item.title}(${detail.sectionTitle})` },
-                // });
-
-                // if (!existingData) {
                 const data = await prisma.birthSupportData.create({
                   data: {
                     number: item.number,
@@ -183,24 +165,20 @@ module.exports = {
                     registrationDate: item.registrationDate,
                     addressProvince: item.addressProvince,
                     addressCity: item.addressCity,
-                    supportTarget: supportTarget, // 지원대상
-                    supportContent: supportContent, // 지원내용
-                    inquiryContact: inquiryContact, // 문의처
-                    inquiryDetail: inquiryDetail, // 문의
-                    applicationMethod: applicationMethod, // 신청자격
-                    requiredDocuments: requiredDocuments, // 구비서류
-                    source: source, // 출처
-                    eligibility: eligibility, // 지원자격
-                    supportAmount: supportAmount, // 지원금액
-                    applicationPeriod: applicationPeriod, // 신청기간
-                    applicationMethodDetail: applicationMethodDetail, // 신청방법
-                    supportItems: supportItems, // 지원품목
+                    supportTarget: supportTarget,
+                    supportContent: supportContent,
+                    inquiryContact: inquiryContact,
+                    inquiryDetail: inquiryDetail,
+                    applicationMethod: applicationMethod,
+                    requiredDocuments: requiredDocuments,
+                    source: source,
+                    eligibility: eligibility,
+                    supportAmount: supportAmount,
+                    applicationPeriod: applicationPeriod,
+                    applicationMethodDetail: applicationMethodDetail,
+                    supportItems: supportItems,
                   },
                 });
-                console.log(data);
-                // } else {
-                //   console.log(`Item ${item.number} already exists in the database. Skipping.`);
-                // }
               }
             }
 

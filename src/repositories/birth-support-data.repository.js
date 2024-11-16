@@ -3,7 +3,7 @@ export class BirthSupportDataRepository {
     this.prisma = prisma;
   }
 
-  async getAllBirthSupportData({ whereClause, limit, offset, orderBy }) {
+  async getBirthSupportList({ whereClause, limit, offset, orderBy }) {
     const excludeAllEmptyCondition = {
       NOT: {
         AND: [
@@ -32,7 +32,37 @@ export class BirthSupportDataRepository {
       where: finalWhereClause,
       skip: offset,
       take: +limit,
-      orderBy: orderBy,
+      orderBy,
+    });
+  }
+
+  async getTotalCount(whereClause) {
+    const excludeAllEmptyCondition = {
+      NOT: {
+        AND: [
+          { supportTarget: { equals: "" } },
+          { supportContent: { equals: "" } },
+          { inquiryContact: { equals: "" } },
+          { inquiryDetail: { equals: "" } },
+          { applicationMethod: { equals: "" } },
+          { requiredDocuments: { equals: "" } },
+          { source: { equals: "" } },
+          { eligibility: { equals: "" } },
+          { supportAmount: { equals: "" } },
+          { applicationPeriod: { equals: "" } },
+          { applicationMethodDetail: { equals: "" } },
+          { supportItems: { equals: "" } },
+        ],
+      },
+    };
+
+    const finalWhereClause = {
+      ...whereClause,
+      ...excludeAllEmptyCondition,
+    };
+
+    return this.prisma.birthSupportData.count({
+      where: finalWhereClause,
     });
   }
 
