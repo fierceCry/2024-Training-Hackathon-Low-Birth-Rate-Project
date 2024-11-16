@@ -7,11 +7,13 @@ export class ChatService {
   constructor(chatRepository) {
     this.chatRepository = chatRepository;
   }
+  // TODO: Retrieve latest x(count with input) messages from database
 
   async createChat({ id, message, isRespectful }) {
     logger.info('message', message)
     let initialPrompt;
     if (isRespectful) {
+      // TODO: use english prompt and translate response into Korean.
       initialPrompt = `
         당신은 전문적인 심리상담사 역할을 수행하는 AI입니다. 미혼모분들이 겪고 계신 다양한 심리적, 정서적 어려움들을 함께 나누고, 자존감을 회복하며, 사회적 연결감을 느끼실 수 있도록 도와드리는 것이 당신의 임무입니다.
     
@@ -43,6 +45,7 @@ export class ChatService {
         - "지금까지 어떤 상황에서 힘든 감정을 느끼셨는지 더 자세히 들려주실 수 있나요?"
         - "최근에 겪으신 일 중에 특히 더 힘들었던 일이 있었을까요?"
         - "그 상황에서 어떤 감정을 느끼셨는지 더 알고 싶습니다."
+
       `;
     } else {
       initialPrompt = `
@@ -85,6 +88,14 @@ export class ChatService {
     //   messageType: 'user',
     // });
 
+
+
+      // TODO: 1. Move this prompt to separate json file
+      // TODO: 2. use json output mode
+      // TODO: 3. include previous conversation
+      // TODO: 4. Limit chat output
+      // TODO: 5. Save chat response
+
     const response = await openai.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,
       messages: [
@@ -93,11 +104,16 @@ export class ChatService {
       ],
       temperature: 1,
     });
+    // TODO: temperature 등 Parameter 조절
+    // TODO: use json output
 
     const chatResponse = response.choices[0].message.content;
     const cleanedResponse = chatResponse.replace(/\n/g, " ");
     logger.info(cleanedResponse)
     return cleanedResponse
+
+    // TODO: save chat response correctly
+
     // return this.chatRepository.createChat({
     //   id,
     //   message: cleanedResponse,
