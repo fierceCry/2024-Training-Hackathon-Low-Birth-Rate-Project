@@ -39,7 +39,7 @@ const authMiddleware = async (req, res, next) => {
       throw new HttpError.Unauthorized("인증 정보가 유효하지 않습니다.");
     }
     const { id } = payload;
-    const user = await authRepository.findUserById(id);
+    const user = await authRepository.findUserById({id});
     if (!user) {
       throw new HttpError.NotFound("인증 정보와 일치하는 사용자가 없습니다.");
     }

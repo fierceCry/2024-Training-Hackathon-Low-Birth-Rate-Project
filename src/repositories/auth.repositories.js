@@ -1,3 +1,7 @@
+import getLogger from "../common/logger.js";
+
+const logger = getLogger('AuthRepository')
+
 export class AuthRepository {
   constructor(prisma) {
     this.prisma = prisma;
@@ -12,6 +16,7 @@ export class AuthRepository {
   }
 
   async findByUserName({ name }) {
+    logger.info('name', name)
     return this.prisma.user.findFirst({
       where: {
         name
@@ -30,7 +35,6 @@ export class AuthRepository {
   }
 
   async createToken({ userId, hashRefreshToken }) {
-    console.log(hashRefreshToken)
     return this.prisma.refreshToken.upsert({
       where: {
         userId: userId,
