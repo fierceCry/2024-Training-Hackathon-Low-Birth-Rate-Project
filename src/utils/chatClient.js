@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { ENV_KEY } from "../constants/env.constants.js";
 
-class OpenAiClient {
+class ChatClient {
   constructor() {
     this.client = new OpenAI({
       apiKey: ENV_KEY.OPENAI_API_KEY,
@@ -37,6 +37,6 @@ class OpenAiClient {
   }
 }
 
-const openAiClient = new OpenAiClient();
+const chatClient = new ChatClient();
 
-export { OpenAiClient, openAiClient };
+export { ChatClient, chatClient };

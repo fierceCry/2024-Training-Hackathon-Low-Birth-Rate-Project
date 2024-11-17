@@ -1,4 +1,4 @@
-import { openAiClient } from "../utils/open-ai.api.js";
+import { chatClient } from "../utils/chatClient.js";
 import getLogger from "../common/logger.js";
 
 const logger = getLogger('chatService')
@@ -25,7 +25,7 @@ export class ChatService {
       // TODO: 4. Limit chat output
       // TODO: 5. Save chat response
 
-    const response = await openAiClient.createChatResponse(message);
+    const response = await chatClient.createChatResponse(message);
     // TODO: temperature 등 Parameter 조절
     // TODO: use json output
 
