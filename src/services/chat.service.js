@@ -1,46 +1,37 @@
 import { chatClient } from "../utils/chatClient.js";
 import getLogger from "../common/logger.js";
 
-const logger = getLogger('chatService')
+const logger = getLogger("chatService");
 export class ChatService {
   constructor(chatRepository) {
     this.chatRepository = chatRepository;
   }
-  // TODO: Retrieve latest x(count with input) messages from database
 
   async createChat({ id, message, isRespectful }) {
     logger.info("message", message);
 
-    const initialPrompt = isRespectful ? respectfulPrompt : notRespectfulPrompt;
+    const previousChats = await this.chatRepository.findChatUserList({
+      userId: id,
+    });
+    logger.info("previousChats", previousChats);
 
-    // await this.chatRepository.createChat({
-    //   id,
-    //   message,
-    //   messageType: 'user',
-    // });
+    const previousChatsString = previousChats
+      .map((chat) => `${chat.sender}: ${chat.message}`)
+      .join("\n");
+    logger.info("previousChatsString", previousChatsString);
 
-      // TODO: 1. Move this prompt to separate json file
-      // TODO: 2. use json output mode
-      // TODO: 3. include previous conversation
-      // TODO: 4. Limit chat output
-      // TODO: 5. Save chat response
+    // TODO: save user message
 
-    const response = await chatClient.createChatResponse(message);
-    // TODO: temperature 등 Parameter 조절
-    // TODO: use json output
+    const response = await chatClient.createChatResponse({
+      isRespectful,
+      chatHistory: previousChatsString,
+      userMessage: message,
+    });
 
-    const chatResponse = response.choices[0].message.content;
-    const cleanedResponse = chatResponse.replace(/\n/g, " ");
-    logger.info(cleanedResponse)
-    return cleanedResponse
+    logger.info("response", response);
 
-    // TODO: save chat response correctly
-
-    // return this.chatRepository.createChat({
-    //   id,
-    //   message: cleanedResponse,
-    //   messageType: 'assistant',
-    // });
+    // TODO: Save chat response
+    return response;
   }
 
   async findChatUserList(id) {

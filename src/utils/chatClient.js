@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { ENV_KEY } from "../constants/env.constants.js";
+import { respectfulPrompt, notRespectfulPrompt } from "../prompts/chatResponse.js";
 
 class ChatClient {
   constructor() {
@@ -9,8 +10,12 @@ class ChatClient {
     });
   }
 
-  async createChatResponse(message) {
-    console.log("createChatResponse", message);
+  // TODO: temperature 등 Parameter 조절
+  // TODO: use json output mode
+  async createChatResponse({ isRespectful = true, chatHistory, userMessage }) {
+    console.log("createChatResponse", { isRespectful, chatHistory, userMessage });
+
+    const initialPrompt = isRespectful ? respectfulPrompt : notRespectfulPrompt;
 
     const response = await this.client.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,
