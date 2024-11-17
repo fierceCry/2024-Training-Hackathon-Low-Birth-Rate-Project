@@ -27,18 +27,42 @@ class ChatClient {
     return response.choices[0].message.content;
   }
 
-  async checkMessageType(message) {
+  async checkMessageType({ message, messageType }) {
     console.log("checkMessageType", message);
 
     // TODO: Use proper prompt
     const response = await this.client.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL_FOR_SMALL_TASK,
-      messages: [{ role: "user", content: message }],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "isMessageType",
+          description: `Check if the message corresponds to the ${messageType} and return true or false`,
+          schema: {
+            type: "object",
+            properties: {
+              isMessageType: { type: "boolean" },
+            },
+            required: ["isMessageType"],
+            additionalProperties: false,
+          },
+          strict: true,
+        },
+      },
+      messages: [
+        {
+          role: "system",
+          content: `Check if the message corresponds to the ${messageType} and return true or false using json format`,
+        },
+        { role: "user", content: message },
+      ],
     });
-
     console.log("response", response);
 
-    return response.choices[0].message.content;
+    const jsonResponse = JSON.parse(response.choices[0].message.content);
+    console.log("jsonResponse", jsonResponse);
+
+    return jsonResponse.isMessageType;
   }
 }
 
