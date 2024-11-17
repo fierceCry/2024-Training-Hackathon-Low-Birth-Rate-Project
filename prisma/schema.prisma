@@ -84,6 +84,8 @@ model Chat {
   createdAt    DateTime  @default(now()) @map("created_at")
 
   user      User       @relation(fields: [userId], references: [id])
+
+  @@index([userId])
   @@map("chat")
 }
 
