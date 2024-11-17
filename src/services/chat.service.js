@@ -20,8 +20,6 @@ export class ChatService {
       .join("\n");
     logger.info("previousChatsString", previousChatsString);
 
-    // TODO: save user message
-
     const response = await chatClient.createChatResponse({
       isRespectful,
       chatHistory: previousChatsString,
@@ -30,7 +28,20 @@ export class ChatService {
 
     logger.info("response", response);
 
-    // TODO: Save chat response
+    await Promise.all([
+      this.chatRepository.createChat({
+        id,
+        message,
+        sender: "user",
+        messageType: "normal",
+      }),
+      this.chatRepository.createChat({
+        id,
+        message: response,
+        sender: "assistant",
+        messageType: "normal",
+      }),
+    ]);
     return response;
   }
 
