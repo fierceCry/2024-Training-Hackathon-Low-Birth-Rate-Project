@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { ENV_KEY } from "../constants/env.constants.js";
 import { respectfulPrompt, notRespectfulPrompt } from "../prompts/chatResponse.js";
+import { prompts } from "../prompts/messageType.js";
 
 class ChatClient {
   constructor() {
@@ -57,7 +58,7 @@ class ChatClient {
       messages: [
         {
           role: "system",
-          content: `Check if the message corresponds to the ${messageType} and return true or false using json format`,
+          content: prompts[messageType],
         },
         { role: "user", content: message },
       ],
