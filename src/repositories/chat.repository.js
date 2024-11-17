@@ -5,12 +5,13 @@ export class ChatRepository {
     this.prisma = prisma;
   }
 
-  async createChat({ id, message, messageType }) {
+  async createChat({ id, message, messageType, sender }) {
     return this.prisma.chat.create({
       data: {
         userId: id,
         message,
-        messageType
+        sender,
+        messageType,
       },
     });
   }
