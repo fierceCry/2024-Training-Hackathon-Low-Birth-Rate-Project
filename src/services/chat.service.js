@@ -8,7 +8,7 @@ export class ChatService {
     this.chatRepository = chatRepository;
   }
 
-  async createChat({ id, message, isRespectful }) {
+  async createChat({ id, message, isRespectful = false }) {
     logger.info("message", message);
 
     const previousChats = await this.chatRepository.findChatUserList({
@@ -16,10 +16,7 @@ export class ChatService {
     });
     logger.info("previousChats", previousChats);
 
-    const previousChatsString = previousChats
-      .map((chat) => `${chat.sender}: ${chat.message}`)
-      .join("\n");
-    logger.info("previousChatsString", previousChatsString);
+    previousChats.sort((a, b) => a.createdAt - b.createdAt);
 
     const [relatedToSuicide, askingGovernmentHelp, response] = await Promise.all([
       chatClient.checkMessageType({ message, messageType: messageType.relatedToSuicide }),
@@ -29,28 +26,29 @@ export class ChatService {
       }),
       chatClient.createChatResponse({
         isRespectful,
-        chatHistory: previousChatsString,
+        chatHistory: previousChats,
         userMessage: message,
       }),
     ]);
-    logger.info({ relatedToSuicide, askingGovernmentHelp, response });
+    console.log({ relatedToSuicide, askingGovernmentHelp, response });
 
     const _messageType = checkMessageType({ relatedToSuicide, askingGovernmentHelp });
 
-    await Promise.all([
-      this.chatRepository.createChat({
+    await this.chatRepository
+      .createChat({
         id,
         message,
-        sender: "user",
+        role: "user",
         messageType: _messageType,
-      }),
-      this.chatRepository.createChat({
-        id,
-        message: response,
-        sender: "assistant",
-        messageType: _messageType,
-      }),
-    ]);
+      })
+      .then(() =>
+        this.chatRepository.createChat({
+          id,
+          message: response,
+          role: "assistant",
+          messageType: _messageType,
+        }),
+      );
     return { messageType, response };
   }
 

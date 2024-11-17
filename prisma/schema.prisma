@@ -78,7 +78,7 @@ model Chat {
   id           Int       @id @default(autoincrement())
   userId       Int       // TODO: 인덱스 관리
   message      String     @db.Text
-  sender       SenderType
+  role       SenderType
   messageType MessageType
   createdAt    DateTime  @default(now()) @map("created_at")
 

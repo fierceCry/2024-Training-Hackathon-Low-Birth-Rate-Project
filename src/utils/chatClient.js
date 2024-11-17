@@ -10,27 +10,32 @@ class ChatClient {
     });
   }
 
-  // TODO: temperature 등 Parameter 조절
-  // TODO: use json output mode
-  async createChatResponse({ isRespectful = true, chatHistory, userMessage }) {
+  // The format of chatHistory is [{ role: "user" | "assistant", content: string }, ...]
+  // order of chatHistory is from the oldest to the latest
+  async createChatResponse({ isRespectful = true, chatHistory = [], userMessage }) {
     console.log("createChatResponse", { isRespectful, chatHistory, userMessage });
 
-    const initialPrompt = isRespectful ? respectfulPrompt : notRespectfulPrompt;
+    const systemPrompt = isRespectful ? respectfulPrompt : notRespectfulPrompt;
 
     const response = await this.client.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,
-      messages: [{ role: "user", content: message }],
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...chatHistory.map(({ role, message }) => ({ role, content: message })),
+        { role: "user", content: userMessage },
+      ],
     });
-
     console.log("response", response);
 
-    return response.choices[0].message.content;
+    const message = response.choices[0].message.content;
+    console.log("message", message);
+
+    return message;
   }
 
   async checkMessageType({ message, messageType }) {
     console.log("checkMessageType", message);
 
-    // TODO: Use proper prompt
     const response = await this.client.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL_FOR_SMALL_TASK,
       response_format: {
