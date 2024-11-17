@@ -49,7 +49,7 @@ export class ChatService {
           messageType: _messageType,
         }),
       );
-    return { messageType, response };
+    return { messageType: _messageType, response };
   }
 
   async findChatUserList(id) {
