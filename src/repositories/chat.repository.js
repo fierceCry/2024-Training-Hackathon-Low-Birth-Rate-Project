@@ -13,9 +13,11 @@ export class ChatRepository {
     });
   }
 
-  async findChatUserList(id) {
+  async findChatUserList({ userId, count }) {
     return this.prisma.chat.findMany({
-        where: { userId: id }
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: count,
     });
   }
 }

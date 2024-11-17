@@ -22,9 +22,9 @@ export class ChatController {
 
   chatList = async (req, res, next) => {
     try {
-      const { id } = req.user
-      const result = await this.chatService.findChatUserList(id)
-      return res.status(HTTP_STATUS.OK).json({ data: result})
+      const { id } = req.user;
+      const result = await this.chatService.findChatUserList({ userId: id });
+      return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {
       next(error);
     }

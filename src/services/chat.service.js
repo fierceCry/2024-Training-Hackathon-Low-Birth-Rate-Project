@@ -44,6 +44,6 @@ export class ChatService {
   }
 
   async findChatUserList(id) {
-    return this.chatRepository.findChatUserList(id);
+    return this.chatRepository.findChatUserList({ userId: id });
   }
 }
