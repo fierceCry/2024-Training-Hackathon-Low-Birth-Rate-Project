@@ -69,6 +69,7 @@ model Scrap {
   birthSupportDataId Int @map("birth_support_data_id")
   createdAt  DateTime  @default(now())  @map("created_at")  
   updatedAt  DateTime  @updatedAt       @map("updated_at")
+  deletedAt  DateTime?      @map("deleted_at")                          // 삭제일 (논리 삭제)
 
   user        User      @relation(fields: [userId], references: [id])
   birthSupportData  BirthSupportData @relation(fields: [birthSupportDataId], references: [ id])

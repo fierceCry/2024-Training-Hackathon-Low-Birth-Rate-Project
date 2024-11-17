@@ -8,6 +8,6 @@ export class ScrapService {
   }
 
   async getScrap({id}){
-    return this.scrapRepository.getScrap({id})
+    return this.scrapRepository.getUserScraps({id})
   }
 }
