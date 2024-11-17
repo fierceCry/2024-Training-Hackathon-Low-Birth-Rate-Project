@@ -20,12 +20,15 @@ export class ChatService {
       .join("\n");
     logger.info("previousChatsString", previousChatsString);
 
-    const response = await chatClient.createChatResponse({
-      isRespectful,
-      chatHistory: previousChatsString,
-      userMessage: message,
-    });
-
+    const [messageType, response] = await Promise.all([
+      chatClient.checkMessageType(message),
+      chatClient.createChatResponse({
+        isRespectful,
+        chatHistory: previousChatsString,
+        userMessage: message,
+      }),
+    ]);
+    logger.info("messageType", messageType);
     logger.info("response", response);
 
     await Promise.all([
@@ -33,13 +36,13 @@ export class ChatService {
         id,
         message,
         sender: "user",
-        messageType: "normal",
+        messageType,
       }),
       this.chatRepository.createChat({
         id,
         message: response,
         sender: "assistant",
-        messageType: "normal",
+        messageType,
       }),
     ]);
     return response;
