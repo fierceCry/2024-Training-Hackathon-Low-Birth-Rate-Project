@@ -1,5 +1,6 @@
 import { chatClient } from "../utils/chatClient.js";
 import getLogger from "../common/logger.js";
+import { messageType, checkMessageType } from "../types/messageType.js";
 
 const logger = getLogger("chatService");
 export class ChatService {
@@ -20,29 +21,34 @@ export class ChatService {
       .join("\n");
     logger.info("previousChatsString", previousChatsString);
 
-    const [messageType, response] = await Promise.all([
-      chatClient.checkMessageType(message),
+    const [relatedToSuicide, askingGovernmentHelp, response] = await Promise.all([
+      chatClient.checkMessageType({ message, messageType: messageType.relatedToSuicide }),
+      chatClient.checkMessageType({
+        message,
+        messageType: messageType.askingGovernmentHelp,
+      }),
       chatClient.createChatResponse({
         isRespectful,
         chatHistory: previousChatsString,
         userMessage: message,
       }),
     ]);
-    logger.info("messageType", messageType);
-    logger.info("response", response);
+    logger.info({ relatedToSuicide, askingGovernmentHelp, response });
+
+    const _messageType = checkMessageType({ relatedToSuicide, askingGovernmentHelp });
 
     await Promise.all([
       this.chatRepository.createChat({
         id,
         message,
         sender: "user",
-        messageType,
+        messageType: _messageType,
       }),
       this.chatRepository.createChat({
         id,
         message: response,
         sender: "assistant",
-        messageType,
+        messageType: _messageType,
       }),
     ]);
     return { messageType, response };
