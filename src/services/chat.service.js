@@ -45,7 +45,7 @@ export class ChatService {
         messageType,
       }),
     ]);
-    return response;
+    return { messageType, response };
   }
 
   async findChatUserList(id) {
