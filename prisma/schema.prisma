@@ -93,6 +93,6 @@ enum SenderType {
 
 enum MessageType {
   normal
-  warning
-  inquiry
+  relatedToSuicide
+  askingGovernmentHelp
 }
