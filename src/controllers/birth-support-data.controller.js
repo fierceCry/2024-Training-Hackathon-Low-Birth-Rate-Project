@@ -23,7 +23,7 @@ export class BirthSupportDataController {
         page,
         sortBy,
       });
-      
+
       return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {
       next(error);
@@ -35,6 +35,22 @@ export class BirthSupportDataController {
       const { birthSupportDataId } = req.params;
       const result = await this.birthSupportDataService.getBirthSupportDataById({
         birthSupportDataId,
+      });
+      return res.status(HTTP_STATUS.OK).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getRecommendedBirthSupportData = async (req, res, next) => {
+    try {
+      const { id } = req.user;
+      const { birthDate, childrenCount, yearsOfResidence } = req.query;
+      const result = await this.birthSupportDataService.getRecommendedBirthSupportData({
+        id,
+        birthDate,
+        childrenCount,
+        yearsOfResidence,
       });
       return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {

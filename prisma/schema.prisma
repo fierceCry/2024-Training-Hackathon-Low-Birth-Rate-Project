@@ -61,6 +61,8 @@ model BirthSupportData {
   applicationMethodDetail   String?        @db.Text @map("application_method_detail")  // 신청방법
   supportItems              String?        @db.Text @map("support_items")              // 지원품목
 
+  embedding                 Json?          @map("embedding")                          // 임베딩 값 추가
+
   scrap                     Scrap[]                                                    // 스크랩 정보와의 관계
 
   @@map("birth_support_data")
