@@ -4,13 +4,31 @@ import { messageType, checkMessageType } from "../types/messageType.js";
 
 const logger = getLogger("chatService");
 export class ChatService {
-  constructor(chatRepository) {
+  constructor(chatRepository, userRepository) {
     this.chatRepository = chatRepository;
+    this.userRepository = userRepository
   }
 
-  async createChat({ id, message, isRespectful = false }) {
+  async createChat({ id, message, isRespectful = null, chatName = null }) {
     logger.info("message", message);
 
+    const user = await this.userRepository.findUserById({ id });
+
+    const mode = isRespectful !== null ? isRespectful : user.isRespectful;
+
+    if (isRespectful !== null && isRespectful !== user.isRespectful) {
+      await this.userRepository.updateUserMode({
+        id,
+        isRespectful,
+      });
+    }
+    
+    let userChatName = chatName;
+    if (!chatName) {
+      const userChat = await this.chatRepository.findChatName({ userId: id });
+      userChatName = userChat;
+    }
+  
     const previousChats = await this.chatRepository.findChatUserList({
       userId: id,
     });
@@ -25,7 +43,7 @@ export class ChatService {
         messageType: messageType.askingGovernmentHelp,
       }),
       chatClient.createChatResponse({
-        isRespectful,
+        isRespectful: mode,
         chatHistory: previousChats,
         userMessage: message,
       }),
@@ -33,13 +51,13 @@ export class ChatService {
     console.log({ relatedToSuicide, askingGovernmentHelp, response });
 
     const _messageType = checkMessageType({ relatedToSuicide, askingGovernmentHelp });
-
     await this.chatRepository
       .createChat({
         id,
         message,
         role: "user",
         messageType: _messageType,
+        chatName: chatName || userChatName.chatName
       })
       .then(() =>
         this.chatRepository.createChat({
@@ -49,10 +67,12 @@ export class ChatService {
           messageType: _messageType,
         }),
       );
+    console.log('result',_messageType, response)
+    
     return { messageType: _messageType, response };
   }
 
-  async findChatUserList(id) {
-    return this.chatRepository.findChatUserList({ userId: id });
+  async findChatUserList({userId}) {
+    return this.chatRepository.findChatList({ userId });
   }
 }

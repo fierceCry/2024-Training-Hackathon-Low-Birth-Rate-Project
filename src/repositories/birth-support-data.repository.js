@@ -33,6 +33,32 @@ export class BirthSupportDataRepository {
       skip: offset,
       take: +limit,
       orderBy,
+      select: {
+        id: true,
+        number: true,
+        title: true,
+        registrationDate: true,
+        addressProvince: true,
+        addressCity: true,
+        viewCount: true,
+        scrapCount: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        supportTarget: true,
+        supportContent: true,
+        inquiryContact: true,
+        inquiryDetail: true,
+        applicationMethod: true,
+        requiredDocuments: true,
+        source: true,
+        eligibility: true,
+        supportAmount: true,
+        applicationPeriod: true,
+        applicationMethodDetail: true,
+        supportItems: true,
+        embedding: false,
+      },    
     });
   }
 
@@ -57,7 +83,33 @@ export class BirthSupportDataRepository {
     };
 
     return this.prisma.birthSupportData.findMany({
-      where: excludeAllEmptyCondition
+      where: excludeAllEmptyCondition,
+      select: {
+        id: true,
+        number: true,
+        title: true,
+        registrationDate: true,
+        addressProvince: true,
+        addressCity: true,
+        viewCount: true,
+        scrapCount: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        supportTarget: true,
+        supportContent: true,
+        inquiryContact: true,
+        inquiryDetail: true,
+        applicationMethod: true,
+        requiredDocuments: true,
+        source: true,
+        eligibility: true,
+        supportAmount: true,
+        applicationPeriod: true,
+        applicationMethodDetail: true,
+        supportItems: true,
+        embedding: false,
+      },
     });
   } 
   async getTotalCount(whereClause) {

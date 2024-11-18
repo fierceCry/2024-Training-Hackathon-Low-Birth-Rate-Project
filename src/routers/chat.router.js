@@ -4,9 +4,11 @@ import { ChatService } from "../services/chat.service.js";
 import { ChatRepository } from "../repositories/chat.repository.js";
 import { prisma} from '../database/db.prisma.js';
 import { authMiddleware } from "../middlewarmies/require-access-token.middleware.js";
+import { AuthRepository } from "../repositories/auth.repositories.js";
 
+const authRepository = new AuthRepository(prisma);
 const chatRepository = new ChatRepository(prisma);  
-const chatService = new ChatService(chatRepository);
+const chatService = new ChatService(chatRepository, authRepository);
 const chatController = new ChatController(chatService);
 
 const chatRouter = express.Router();

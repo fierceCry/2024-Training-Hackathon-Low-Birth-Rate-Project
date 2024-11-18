@@ -18,15 +18,19 @@ export class AuthServices {
   }
 
   async signUp({ email, password, name }) {
+    console.log('email',email)
+    console.log('password', password)
+    console.log('name', name)
+    
     if (!email || !password || !name) {
       throw new HttpError.BadRequest("email, password, name 값 확인해 주세요.");
     }
 
     const userState = userAuthStates[email];
 
-    if (!userState || !userState.isVerified) {
-      throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
-    }
+    // if (!userState || !userState.isVerified) {
+    //   throw new HttpError.BadRequest("이메일 인증이 필요합니다.");
+    // }
 
     const user = await this.authRepository.findUserByEmail({ email });
     if (user) {
@@ -47,6 +51,7 @@ export class AuthServices {
       hashedPassword,
       name,
     });
+    console.log('newUser', newUser)
     delete userAuthStates[email];
     return newUser;
   }
@@ -70,7 +75,8 @@ export class AuthServices {
     }
 
     const { accessToken, refreshToken, hashRefreshToken } = this.generateTokens(user.id);
-
+    console.log('accessToken',accessToken)
+    console.log('refreshToken', refreshToken)
     await this.authRepository.createToken({ userId: user.id, hashRefreshToken });
     return { accessToken, refreshToken };
   }
