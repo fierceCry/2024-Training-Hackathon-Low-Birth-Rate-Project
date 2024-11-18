@@ -11,7 +11,10 @@ model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique @map("email")
   password      String
-  name      String
+  name          String
+  address       String?        @map("address")  // 주소 필드 추가
+  sleepTime     Int?           @map("sleep_time") // 수면시간 필드 추가 (단위: 시간)
+  ageGroup      String?        @map("age_group")  // 연령대 필드 추가
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt  @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
