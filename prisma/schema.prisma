@@ -38,7 +38,7 @@ model BirthSupportData {
   id                        Int            @id @default(autoincrement())               // 고유 ID
   number                    String                                                     // 지원 프로그램 번호
   title                     String         @db.Text                                             // 지원 프로그램 제목
-  registrationDate          String         @map("registration_date")                   // 등록일
+  registrationDate          DateTime       @map("registration_date")                   // 등록일
   addressProvince           String         @map("address_province")                    // 주소 (도)
   addressCity               String         @map("address_city")                        // 주소 (시/군/구)
   viewCount                 Int?           @default(0) @map("view_count")              // 조회수

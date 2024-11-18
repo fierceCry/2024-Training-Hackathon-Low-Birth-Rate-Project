@@ -35,10 +35,10 @@ module.exports = {
               const number = numberElement ? numberElement.innerText.trim() : null;
               const title = titleElement ? titleElement.innerText.trim() : null;
               const viewCount = viewCountElement ? viewCountElement.innerText.trim() : null;
-              const registrationDate = registrationDateElement
+              const registrationDateString = registrationDateElement
                 ? registrationDateElement.innerText.trim()
                 : null;
-              return { number, title, viewCount, registrationDate, onclick };
+              return { number, title, viewCount, registrationDateString, onclick };
             })
             .filter((item) => item.number && item.title);
         });
@@ -157,12 +157,13 @@ module.exports = {
                     }
                   }
                 }
-                
+                const registrationDate = new Date(item.registrationDateString);
+
                 const data = await prisma.birthSupportData.create({
                   data: {
                     number: item.number,
                     title: `${item.title}(${detail.sectionTitle})`,
-                    registrationDate: item.registrationDate,
+                    registrationDate: registrationDate,
                     addressProvince: item.addressProvince,
                     addressCity: item.addressCity,
                     supportTarget: supportTarget,
