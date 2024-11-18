@@ -62,4 +62,11 @@ export class AuthRepository {
       where: { userId: id },
     });
   }
+
+  async updateUserMode({ id, isRespectful, chatName }) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { isRespectful, chatName },
+    });
+  }
 }

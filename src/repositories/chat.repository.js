@@ -5,13 +5,14 @@ export class ChatRepository {
     this.prisma = prisma;
   }
 
-  async createChat({ id, message, messageType, role }) {
+  async createChat({ id, message, messageType, role, chatName }) {
     return this.prisma.chat.create({
       data: {
-        userId: id,
+        userId: +id,
         message,
         role,
         messageType,
+        chatName: chatName,
       },
     });
   }
@@ -21,6 +22,28 @@ export class ChatRepository {
       where: { userId },
       orderBy: { createdAt: "desc" },
       take: count,
+    });
+  }
+
+  async findChatList({ userId }) {
+    return this.prisma.chat.findMany({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async findChatName({ userId }) {
+    return this.prisma.chat.findFirst({
+      where: {
+        userId,
+        chatName: {
+          not: null,
+        }
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {chatName: true}
     });
   }
 }

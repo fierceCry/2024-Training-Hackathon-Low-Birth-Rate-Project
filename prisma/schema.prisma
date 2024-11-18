@@ -15,6 +15,8 @@ model User {
   address       String?        @map("address")  // 주소 필드 추가
   sleepTime     Int?           @map("sleep_time") // 수면시간 필드 추가 (단위: 시간)
   ageGroup      String?        @map("age_group")  // 연령대 필드 추가
+  isRespectful  Boolean         @default(true) // 기본값: 높임말
+
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt  @map("updated_at")
   deletedAt     DateTime?      @map("deleted_at")
@@ -83,6 +85,7 @@ model Scrap {
 model Chat {
   id           Int       @id @default(autoincrement())
   userId       Int       // TODO: 인덱스 관리
+  chatName     String?
   message      String     @db.Text
   role       SenderType
   messageType MessageType

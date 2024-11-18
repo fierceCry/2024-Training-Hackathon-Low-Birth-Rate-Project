@@ -5,6 +5,20 @@
     "version": "1.0.0",
     "description": "해커톤 API 문서"
   },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT" 
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
     "/auth/sign-up": {
       "post": {
@@ -740,7 +754,12 @@
                   "isRespectful": {
                     "type": "boolean",
                     "description": "존중적인 메시지인지 여부",
-                    "default": true
+                    "default": false
+                  },
+                  "chatName": {
+                    "type": "string",
+                    "description": "호칭",
+                    "default": false
                   }
                 },
                 "required": ["message"]

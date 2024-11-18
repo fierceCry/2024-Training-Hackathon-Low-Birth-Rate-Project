@@ -16,7 +16,12 @@ class ChatClient {
   async createChatResponse({ isRespectful = true, chatHistory = [], userMessage }) {
     console.log("createChatResponse", { isRespectful, chatHistory, userMessage });
 
-    const systemPrompt = isRespectful ? respectfulPrompt : notRespectfulPrompt;
+    const lastChat = chatHistory.find(chat => chat.chatName);
+    const userName = lastChat ? lastChat.chatName : '내담자';
+    
+    const systemPrompt = isRespectful
+    ? respectfulPrompt(userName)
+    : notRespectfulPrompt(userName);
 
     const response = await this.client.chat.completions.create({
       model: ENV_KEY.OPENAI_MODEL,

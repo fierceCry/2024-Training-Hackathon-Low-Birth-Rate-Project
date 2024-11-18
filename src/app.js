@@ -3,9 +3,14 @@ import { ENV_KEY } from "./constants/env.constants.js";
 import { router } from "./routers/index.js";
 import { globalErrorHandler } from "./middlewarmies/error-handler.middleware.js";
 import { HTTP_STATUS } from "./constants/http-status.constant.js";
-import { swaggerSpec } from "./utils/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import cors from 'cors'
+import path from "path";
+import fs from "fs/promises";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -17,6 +22,10 @@ app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(router);
 app.use(globalErrorHandler);
+
+const swaggerFilePath = path.resolve(__dirname, "../openapi.json")
+const swaggerSpec = JSON.parse(await fs.readFile(swaggerFilePath, "utf8"));
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/api", (req, res) => {

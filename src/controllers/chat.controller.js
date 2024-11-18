@@ -8,11 +8,12 @@ export class ChatController {
   handleChat = async (req, res, next) => {
     try {
       const { id } = req.user;
-      const { message, isRespectful = true } = req.body;
+      const { message, isRespectful = null, chatName = null } = req.body;
       const { messageType, response } = await this.chatService.createChat({
         id,
         message,
         isRespectful,
+        chatName
       });
       return res.status(HTTP_STATUS.CREATED).json({
         data: {
