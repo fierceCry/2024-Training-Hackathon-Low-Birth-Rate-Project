@@ -126,7 +126,7 @@ export class AuthServices {
     logger.info('nickname', nickname)
     const user = await this.authRepository.findByUserName({name: nickname})
     if(user){
-      throw new HttpError.NotFound('사용중인 닉네임입니다.')
+      throw new HttpError.Conflict('사용중인 닉네임입니다.')
     }
 
     return null;

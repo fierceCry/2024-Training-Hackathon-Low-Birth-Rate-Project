@@ -70,6 +70,17 @@ class ChatClient {
 
     return jsonResponse.isMessageType;
   }
+
+  async getEmbedding(text) {
+    const response = await this.client.embeddings.create({
+      model: ENV_KEY.OPENAI_MODEL_EMBEDDING,
+      input: text,
+    });
+    const embedding = response.data[0].embedding;
+    console.log("Embedding:", embedding);
+
+    return embedding;
+  }
 }
 
 const chatClient = new ChatClient();

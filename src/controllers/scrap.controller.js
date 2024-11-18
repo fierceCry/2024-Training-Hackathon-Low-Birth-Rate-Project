@@ -19,7 +19,7 @@ export class ScrapController {
   getScrap = async (req, res, next) => {
     try {
       const { id } = req.user;
-      const result = await this.scrapService.createScrap({ id });
+      const result = await this.scrapService.getScrap({ id });
       return res.status(HTTP_STATUS.OK).json({ data: result});
     } catch (error) {
       next(error);

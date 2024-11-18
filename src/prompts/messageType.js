@@ -1,4 +1,4 @@
-import { messageType } from "../types/messageType";
+import { messageType } from "../types/messageType.js";
 
 const askingGovernmentHelpPrompt = `Check if the message corresponds to the 'government help' and return true or false using json format`;
 const relatedToSuicidePrompt = `Check if the message corresponds to the 'suicide' and return true or false using json format`;
