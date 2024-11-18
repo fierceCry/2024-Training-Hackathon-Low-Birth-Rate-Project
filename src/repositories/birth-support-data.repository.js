@@ -36,6 +36,30 @@ export class BirthSupportDataRepository {
     });
   }
 
+  async findBirthSupportList() {
+    const excludeAllEmptyCondition = {
+      NOT: {
+        AND: [
+          { supportTarget: { equals: "" } },
+          { supportContent: { equals: "" } },
+          { inquiryContact: { equals: "" } },
+          { inquiryDetail: { equals: "" } },
+          { applicationMethod: { equals: "" } },
+          { requiredDocuments: { equals: "" } },
+          { source: { equals: "" } },
+          { eligibility: { equals: "" } },
+          { supportAmount: { equals: "" } },
+          { applicationPeriod: { equals: "" } },
+          { applicationMethodDetail: { equals: "" } },
+          { supportItems: { equals: "" } },
+        ],
+      },
+    };
+
+    return this.prisma.birthSupportData.findMany({
+      where: excludeAllEmptyCondition
+    });
+  } 
   async getTotalCount(whereClause) {
     const excludeAllEmptyCondition = {
       NOT: {
@@ -82,4 +106,13 @@ export class BirthSupportDataRepository {
       },
     });
   }
+
+  async saveEmbeddingForSupport(supportId, embedding) {
+    console.log('supportId', supportId);
+    await this.prisma.birthSupportData.update({
+      where: { id: +supportId },
+      data: { embedding: embedding }
+    });
+  }
+  
 }

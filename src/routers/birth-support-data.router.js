@@ -3,10 +3,13 @@ import { prisma } from "../database/db.prisma.js";
 import { BirthSupportDataController } from "../controllers/birth-support-data.controller.js";
 import { BirthSupportDataService } from "../services/birth-support-data.service.js";
 import { BirthSupportDataRepository } from "../repositories/birth-support-data.repository.js";
+import { AuthRepository } from "../repositories/auth.repositories.js";
+import { authMiddleware } from "../middlewarmies/require-access-token.middleware.js";
 
 const birthSupportDataRouter = express.Router();
+const authRepository = new AuthRepository(prisma);
 const birthSupportDataRepository = new BirthSupportDataRepository(prisma);
-const birthSupportDataService = new BirthSupportDataService(birthSupportDataRepository);
+const birthSupportDataService = new BirthSupportDataService(birthSupportDataRepository, authRepository);
 const birthSupportDataController = new BirthSupportDataController(birthSupportDataService);
 
 /**
@@ -119,6 +122,7 @@ const birthSupportDataController = new BirthSupportDataController(birthSupportDa
  */
 
 birthSupportDataRouter.get("/all", birthSupportDataController.getAllBirthSupportData);
+birthSupportDataRouter.get("/recommend", authMiddleware, birthSupportDataController.getRecommendedBirthSupportData);
 birthSupportDataRouter.get(
   "/:birthSupportDataId",
   birthSupportDataController.getBirthSupportDataById,
